@@ -1,0 +1,33 @@
+<html>
+<head>
+<script language="javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script language="javascript" type="text/javascript" src="Jit/jit.js"></script>
+<script language="javascript" type="text/javascript" src="xmlToJson.js"></script>
+<script language="javascript" type="text/javascript" src="xml.js"></script>
+<script>
+$(document).ready(function() {
+	obj = xmlToJson((new DOMParser).parseFromString(xml,'text/xml'));
+	console.log(obj);
+	json = JSON.stringify(obj);
+	$("#data").text(json);
+});
+
+var query = 'Websites[asdfas=asdfasdf]//Author/test//test';
+arr = [];
+idx = 0;
+console.log(query);
+$.each(query.split('//'), function() {
+	arr[idx] = this.toString();
+	$.each(this.split('/'), function() {
+		arr[idx][arr[idx].length] = this.toString();
+	});
+	idx++;
+});
+console.log(arr);
+</script>
+</head>
+<body>
+<h1>TEST</h1>
+<div id="data">test</div>    
+</body>
+</html>
