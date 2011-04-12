@@ -12,18 +12,33 @@ $(document).ready(function() {
 	$("#data").text(json);
 });
 
-var query = 'Websites[asdfas=asdfasdf]//Author/test//test';
+var query = "test//test/test//test";
+console.log(query.split("/"))
 arr = [];
-idx = 0;
 console.log(query);
-$.each(query.split('//'), function() {
-	arr[idx] = this.toString();
-	$.each(this.split('/'), function() {
-		arr[idx][arr[idx].length] = this.toString();
+$.each(query.split("//"), function(idx, element) {
+	arr[idx] = element;
+	/*
+	$.each(element.split("/"), function(idx2,element2) {
+		console.log(element2);
+		arr[idx] = element;
+		arr[idx][idx2] = element2.toString();
 	});
-	idx++;
+	*/
 });
 console.log(arr);
+
+arr = [];
+idx = 0;
+function splitTest(str) {
+	temp = str.split("/",3);
+	arr[idx] = temp[0]
+	if (temp[1] != "") {
+		arr[idx] = splitTest(temp[1])
+	} else {
+		
+	}
+}
 </script>
 </head>
 <body>
