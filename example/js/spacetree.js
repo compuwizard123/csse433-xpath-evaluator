@@ -20,7 +20,7 @@ function initST(rootNode){
     //id of viz container element  
     injectInto: 'infovis',  
     //set distance between node and its children  
-    levelDistance: 50,
+    levelDistance: 30,
 	orientation: 'top',
     //enable panning  
     Navigation: {  
@@ -31,7 +31,7 @@ function initST(rootNode){
     //set overridable=true for styling individual  
     //nodes or edges  
     Node: {  
-        width: 60,  
+        width: 80,  
         type: 'rectangle',
 		autoHeight: true,
         color: '#aaa',  
@@ -41,7 +41,17 @@ function initST(rootNode){
     Edge: {  
         overridable: true  
     },  
-      
+     
+	Tips: {  
+		enable: true,
+		offsetX: 10,  
+		offsetY: 10,  
+		onShow: function(tip, node) {  
+			tip.innerHTML = node.name;
+			console.log(node.data.someKey)
+		}  
+	},
+	
     onBeforeCompute: function(node){  
     },  
       
@@ -59,13 +69,12 @@ function initST(rootNode){
         };  
         //set label styles  
         var style = label.style;  
-        style.width = 60 + 'px';  
-        style.height = 17 + 'px';              
+        style.width = 60 + 'px'; 
         style.cursor = 'pointer';  
         style.color = '#333';  
         style.fontSize = '0.8em';  
         style.textAlign= 'center';  
-        style.paddingTop = '3px';  
+        style.paddingTop = '3px';
     },  
       
     //This method is called right before plotting  
