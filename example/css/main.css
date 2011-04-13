@@ -1,0 +1,14 @@
+#infovis {
+    width: 600px;
+    height: 400px;
+    margin: auto;
+    overflow: hidden;
+    float: left;
+    padding:.5em;
+}
+
+.tip {
+	background-color: white;
+	border: thin black solid;
+	padding: 5px;
+}

@@ -47,8 +47,14 @@ function initST(rootNode){
 		offsetX: 10,  
 		offsetY: 10,  
 		onShow: function(tip, node) {  
-			tip.innerHTML = node.name;
-			console.log(node.data.someKey)
+			tip.innerHTML = "Name: " + node.name + "<br />";
+			tip.innerHTML += "Text: " + node.data.text + "<br />";
+			tip.innerHTML += "Attributes: <hr>";
+			for(var item in node.data.attributes) {
+				if(item[0] != "$") {
+					tip.innerHTML += item + ":" + node.data.attributes[item] + "<br />";
+				}
+			}
 		}  
 	},
 	
@@ -68,13 +74,16 @@ function initST(rootNode){
             st.onClick(node.id);  
         };  
         //set label styles  
-        var style = label.style;  
-        style.width = 60 + 'px'; 
+        
+		var style = label.style;  
+        style.width = 80 + 'px'; 
         style.cursor = 'pointer';  
+		style.textAlign= 'center';  
+		/*
         style.color = '#333';  
         style.fontSize = '0.8em';  
-        style.textAlign= 'center';  
         style.paddingTop = '3px';
+		*/
     },  
       
     //This method is called right before plotting  

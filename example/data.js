@@ -2,7 +2,7 @@ var json = {
 	id: "node02",
 	name: "0.2",
 	data: {
-		"someKey": "some value",
+		attributes: { "test1": "val1", "test2": "val2"},
 		"someKey2": "some other value"
 	},
 	children: [{
