@@ -22,10 +22,12 @@ function initST(rootNode){
     //set distance between node and its children  
     levelDistance: 30,
 	orientation: 'top',
+	constrained: false,
+	offsetY: 100,
     //enable panning  
     Navigation: {  
       enable:true,  
-      panning:true  
+      panning:false  
     },  
     //set node and edge styles  
     //set overridable=true for styling individual  

@@ -1,0 +1,34 @@
+<html>
+<head>
+<script language="javascript" type="text/javascript" src="xml.js"></script>
+<script>
+xmlDoc = (new DOMParser).parseFromString(xml,'text/xml');
+console.log(xmlDoc);
+var idx = 1;
+var json = '{';
+nodes = xmlDoc.childNodes;
+for(i=0; i<nodes.length; i++) {
+	json += 'id:"' + idx + '",';
+	json += 'name:"' + nodes[i].tagName + '",';
+	json += 'data: { attributes: {';
+	nodeAttrs = nodes[i].attributes
+	numNodeAttrs = nodeAttrs.length
+	if(numNodeAttrs > 1) {
+		for(j=0; j<(numNodeAttrs - 1); j++) {
+			json += '"' + nodeAttrs[j].nodeName + '":"' + nodeAttrs[j].nodeValue + '",';
+		}
+		json += '"' + nodeAttrs[numNodeAttrs-1].nodeName + '":"' + nodeAttrs[numNodeAttrs-1].nodeValue + '"';
+	} else {
+		json += '"' + nodeAttrs[0].nodeName + '":"' + nodeAttrs[0].nodeValue + '"';
+	}
+	json += '},';
+	//json += 'text: "' +  + '"';
+	//console.log(xmlDoc.childNodes[i].tagName);
+	//console.log(nodes[i].nodeValue);
+}
+console.log(json)
+</script>
+</head>
+<body>
+</body>
+</html>
