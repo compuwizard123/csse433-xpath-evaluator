@@ -7,19 +7,51 @@ function json2jit(data)
 	{
 		var arr = [];
 		for (var x in obj)
+		{
+			// We're an attribute OR! #text node
+			// Skip it because the parent should have grabbed it already
+			if (x.substr(0, 1) == '@' || x == '#text')
+				continue;
+
+			// Let's see if this node has any attributes
+			var data = {}
+			if (typeof(obj[x]) == 'object' || obj[x] instanceof Array)
+			{
+				for (var y in obj[x])
+					if (y.substr(0, 1) == '@')
+						data[(y.substr(1).toLowerCase() == 'text') ? 'text ' : y.substr(1)] = obj[x][y];
+					else if (y == '#text')
+						data.text = obj[x][y];
+			}
+			else if (typeof(obj[x]) == 'string')
+				data.text = obj[x];
+
+			// Push the node onto the array stack
 			arr.push(
 			{
 				id       : jQuery.UUID(),
 				name     : nm || x,
-				data     : (typeof(obj[x]) == 'string') ? {'text' : obj[x]} : {},
+				data     : data,
 				children : (typeof(obj[x]) == 'object' || obj[x] instanceof Array) ? loop(obj[x], (obj[x] instanceof Array) ? x : false) : []
 			});
+		}
 
 		return arr;
 	}
 
 	x = loop(data).shift();
 	return x;
+}
+
+function parseXml(str)
+{
+	// Let's try jQuery's parseXML method.  It will try and catch the result
+	// If it catches an exception, then it's invalid, else we assume... sweet!
+	try
+	{
+		return $.parseXML($('#xml').val());
+	}
+	catch(me){ return false; }
 }
 
 function viewTree(json)
@@ -39,7 +71,8 @@ function viewTree(json)
 			Navigation:
 			{
 				enable  : true,
-				panning : 'avoid nodes'
+				panning : 'avoid nodes',
+				zooming : 15
 			},
 
 			Node:
@@ -90,7 +123,7 @@ function viewTree(json)
 								tip.innerHTML += "<tr><td align='left'>"+item+": </td><td align='left'>"+node.data[item]+"</td></tr>"
 						}
 
-						str += "</table>";
+						tip += "</table>";
 						if (hasText)
 							tip.innerHTML += "<hr />";
 					}
@@ -208,8 +241,11 @@ function viewTree(json)
 	else
 		st = $('#treeTab').data('tree');
 
+	var jit = json2jit(json);
+	console.log(jit);
+
 	st.graph.empty();
-	st.loadJSON(json2jit(json));
+	st.loadJSON(jit);
 	st.compute();
 	st.onClick(st.root,
 	{
@@ -253,13 +289,22 @@ $(document).ready(function()
 	// Buttons
 	$('#convert').bind('click', function()
 	{
-		var str = xml2json($.parseXML($('#xml').val()), "  ");
+		var xml = parseXml($('#xml').val());
+		if (xml === false)
+		{
+			alert('Invalid XML!');
+			return false;
+		}
+
+		var str = xml2json(xml, "  ");
 		var json;
 
-		$('#json').data('loaded', true).data('json', eval('json = '+str)).html(str);
+		eval('json = '+str);
+
+		$('#json').data('loaded', true).data('json', json).html(str);
 		viewTree($('#json').data('json'));
-		tabs.find('a[href*="treeTab"]').parent().removeClass('disabled').click();
-	});
+		tabs.find('a[href*="evalTab"]').parent().removeClass('disabled').click();
+	}).trigger('click');
 
 	$('#xpath').bind('keydown', function(e)
 	{

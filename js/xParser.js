@@ -1,3 +1,15 @@
+/*
+ * XPath Evaluator
+ * A web application utilizing JavaScript to provide visual
+ * demonstrations, step-by-step, of XPath expression parsing
+ * and end results
+ *
+ * Authors:  Shawn Dean
+ *           Kevin Risden
+ *
+ * Modified: April 25, 2011
+ */
+
 // Regular expressions that will be applied to the XPath string
 // The way they are ordered below is how they will be applied
 // And the order DOES matter.
@@ -8,21 +20,42 @@ var xParseRE =
 	" and " : " && ",
 	" or "  : " || ",
 
+	// Try to conver [xx=yy] into [xx = yy]
+	"([^\\=\\>\\<\\!\s\\&\\|])\\=([^\\=\s\\&\\|])" : '$1 = $2',
+
 	// Main sucker here
 	// Does most of the node splitting via / into $ query calls
 	// Also checks for some sort of node/attribute as well
-	"([\\#\\*\\@a-z\\_\\.][\\*a-z0-9_\\-\\.]*)(?:\\s|$|\\/)" : "\$('$1').",
+	"([\\#\\*\\@a-z\\_][\\*a-z0-9_\\-\\.]*)(?=(?:\\s|$|\\[|\\]|\\/))" : "\$('$1').",
+	"\\[([0-9])+\\]" : "\$($1).",
+
+	// Dot dot
+	"\\.\\." : "parent().",
 
 	// Double slash
 	"\/\/" : "$",
-	"(^|\\s)\\/" : "root().",
+
+	// Root node and cleanup
+	"(^|\\[|\\s)\\/" : "$1root().",
+	"\\/" : '',
 
 	// Dot dot
 	"(\\.{2,3})(\\$|\/)" : ".parent().$2",
-	"\\.\\." : "parent().",
+
+	// Predicates!
+	"([^\\=\\>\\<\\!])\\=([^\\=])" : '$1==$2',
+	"\\[" : '$(function(node){ with(node){ return(',
+	"\\]" : '); }}).',
 
 	// Cleanup remaining dots and slashes
-	"(\\.(?!\\$|\\p)|\\/)" : '',
+	"\\(\\." : '(',
+	"(\\)\\.|\\])(?!\\$|\\p)" : '$1jsonObj',
+
+	// Count predicate helper
+	"count\\(([^\\)]+)\\)" : "count('$1')",
+
+	// Not predicate helper
+	"not\\(([^\\)]+)\\)" : "not($1)"
 }
 
 function xParser(jsonObj, parNode)
@@ -47,19 +80,19 @@ xParser.prototype =
 
 	parse : function(str)
 	{
-		var quotes = /(\'|\")([^\1]*)\1/;
+		var quotes = /(\'[^\']*\'|\"[^\"]*\")/;
 		var temp   = [];
 
 		while (quotes.test(str))
 		{
-			temp.push(str.match(quotes)[2]);
+			temp.push(str.match(quotes)[1]);
 			str = str.replace(quotes, '%'+(temp.length-1)+'%');
 		}
 
 		for (var x in xParseRE)
 			str = str.replace(new RegExp(x, 'gi'), xParseRE[x]);
 
-		eval('str = "'+str.replace(/\%(\d+)\%/g, 'temp[$1]')+'"');
+		str = str.replace(/\%(\d+)\%/g, function(str, p1){ return temp[p1]; }).replace(/\.jsonObj$/, '');
 		console.log(str);
 		try
 		{
@@ -104,7 +137,7 @@ xParser.prototype =
 					for (var i=0; i<items.length; i++)
 					{
 						var isArr = (self.jsonObj instanceof Array);
-						var item  = new RegExp('^'+items[i].replace(/\*/g, '.*')+'$');
+						var item  = new RegExp('^'+items[i].replace(/\./i, '\\\.').replace(/\*/g, '.*')+'$');
 						var arr   = [];
 
 						for (var prop in self.jsonObj)
@@ -171,7 +204,7 @@ xParser.prototype =
 	{
 		var arr = [];
 		if (typeof(callback) == 'string')
-			eval('callback = function(x){ with(x){ return('+callback+'); }}');
+			eval('callback = function(node){ with(node){ return('+callback+'); }}');
 
 		for (var prop in this.jsonObj)
 		{
@@ -221,7 +254,7 @@ xParser.prototype =
 	/* Inline helpers */
 	hasParent : function()
 	{
-		return (this.parNode);
+		return (this.parNode) ? true : false;
 	},
 
 	/* Predicate / Navigation Helpers */
@@ -233,5 +266,45 @@ xParser.prototype =
 	parent: function()
 	{
 		return (this.hasParent()) ? this.parNode : this;
+	},
+
+	/* Predicate: count
+	 * Returns the count total of 'n' nodes in the current node
+	 *
+	 * Arguments:
+	 *   node [string] (Optional ~ Default: '*')
+	 *     Node name to apply count on
+	 *
+	 * Returns:  Number of child {node} nodes
+	 */
+	count: function(node)
+	{
+		var n = this.$(node || '*').jsonObj;         
+		return (n) ? ((n instanceof Array) ? n.length : 1) : 0;
+	},
+
+	not: function(bool)
+	{
+		return !bool;
+	},
+
+	/* Predicate: last
+	 * Returns boolean value telling if the current node is the last node in the set.
+	 *
+	 * Returns:  Boolean value if this node is the last node
+	 */
+	last: function()
+	{
+		return (this.index == (this.parent().jsonObj.length-1));
+	},
+
+	/* Predicate: position
+	 * Returns position index value of the current node in the node set.
+	 *
+	 * Returns:  Integer value containing the position index value in the node set.
+	 */
+	position: function()
+	{
+		return this.index;
 	}
 }
