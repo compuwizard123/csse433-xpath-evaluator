@@ -2,27 +2,47 @@
 <head>
 	<title>XPath Evaluator</title>
 	<script language="javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
-	<script language="javascript" type="text/javascript" src="js/jquery.json.js"></script>
-	<script language="javascript" type="text/javascript" src="js/jit.js"></script>
-	<script language="javascript" type="text/javascript" src="js/xml2json.js"></script>
-	<script language="javascript" type="text/javascript" src="js/beautify.js"></script>
-	<script language="javascript" type="text/javascript" src="js/xParser.js"></script>
-	<script language="javascript" type="text/javascript" src="js/js.js"></script>
-	<!--[if IE]><script language="javascript" type="text/javascript" src="js/excanvas.js"></script><![endif]-->
-	<link href='css/style.css' rel='stylesheet' type='text/css' media='screen' />
+	<script language="javascript" type="text/javascript" src="public/js/jquery.json.js"></script>
+	<script language="javascript" type="text/javascript" src="public/js/jquery.simplemodal.js"></script>
+	<script language="javascript" type="text/javascript" src="public/js/jit.js"></script>
+	<script language="javascript" type="text/javascript" src="public/js/xml2json.js"></script>
+	<script language="javascript" type="text/javascript" src="public/js/beautify.js"></script>
+	<script language="javascript" type="text/javascript" src="public/js/xParser.js"></script>
+	<script language="javascript" type="text/javascript" src="public/js/js.js"></script>
+	<!--[if IE]><script language="javascript" type="text/javascript" src="public/js/excanvas.js"></script><![endif]-->
+	<link href='public/css/style.css' rel='stylesheet' type='text/css' media='screen' />
 </head>
 <body>
 	<div id='wrapper'>
-		<ul id='tabs'>
-			<li><a href='#xmlTab'>XML Data</a></li>
-			<li><a href='#jsonTab'>JSON</a></li>
-			<li><a href='#evalTab'>Evaluator</a></li>
-			<li class='disabled'><a href='#treeTab'>Tree Viewer</a></li>
-			<li class='right about'><a href='#aboutTab'>About</a></li>
-		</ul>
-		<div id='tabContainer'>
-			<div class='tabCont' id='xmlTab'>
-				<textarea name='xml' id='xml' rows='22' style='width:100%'><bookstore specialty="novel">
+		<div align='center'>
+			<table cellpadding='0' cellspacing='0' width='95%'>
+				<tr>
+					<td align='left' valign='top' width='5%'>
+						<label for='xpath'>XPath</label>
+						<div class='buttons'>
+							<div class='button blue' id='evaluate'>Evaluate</div>
+						</div>
+					</td>
+					<td align='center' valign='top' width='90%'><textarea id='xpath' style='width:90%;height:55px'>//bookstore/book/author</textarea></td>
+					<td align='center' nowrap='nowrap' valign='top' width='5%'>
+						<div class='buttons'>
+							<div class='button blue' id='loadXml'>Load XML</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div align='center' class='seperator hide' id='graphWrap'>
+			<div id='treeGraph'></div>
+		</div>
+		<div align='left' class='seperator hide' id='resultsWrap'>
+			<pre class='results'></pre>
+			<div class='seperator steps'></div>
+		</div>
+	</div>
+	<div id='globalMessage'>Blah blah blah blah blah</div>
+	<div class='dialog' id='xmlDialog'>
+		<textarea id='xmlData' rows='25'><bookstore specialty="novel">
   <book style="autobiography">
     <author>
       <first-name>Joe</first-name>
@@ -35,15 +55,15 @@
     <author>
       <first-name>Mary</first-name>
       <last-name>Bob</last-name>
-      <publication>Selected Short Stories of
-        <first-name>Mary</first-name>
+        <publication>Selected Short Stories of
+          <first-name>Mary</first-name>
+          <last-name>Bob</last-name>
+        </publication>
+      </author>
+      <editor>
+        <first-name>Britney</first-name>
         <last-name>Bob</last-name>
-      </publication>
-    </author>
-    <editor>
-      <first-name>Britney</first-name>
-      <last-name>Bob</last-name>
-    </editor>
+      </editor>
     <price>55</price>
   </book>
   <magazine style="glossy" frequency="monthly">
@@ -63,9 +83,7 @@
     <price intl="Canada" exchange="0.7">6.50</price>
     <excerpt>
       <p>It was a dark and stormy night.</p>
-      <p>But then all nights in Trenton seem dark and
-      stormy to someone who has gone through what
-      <emph>I</emph> have.</p>
+      <p>But then all nights in Trenton seem dark and stormy to someone who has gone through what <emph>I</emph> have.</p>
       <definition-list>
         <term>Trenton</term>
         <definition>misery</definition>
@@ -73,52 +91,16 @@
     </excerpt>
   </book>
 </bookstore></textarea>
-				<div align='center'>
-					<input type='button' id='convert' value='Load &amp; Convert to JSON' />
-				</div>
-			</div>
-			<div class='tabCont' id='jsonTab'>
-				<table cellspacing='0' cellpadding='0' border='0' width='100%'>
-					<tr>
-						<td align='left' valign='top' width='50%'>
-							<pre class='code' id='json'>Load some XML</pre>
-						</td>
-						<td align='left' valign='top' width='50%'>
-							<pre class='code' id='jitJson'></pre>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div class='tabCont' id='evalTab'>
-				<div align='center'>
-					XPath
-					<input type='text' id='xpath' value='//Website' style='width:85%' />
-					<input type='button' id='xparse' value='Evaluate' />
-				</div>
-				<pre id='result'></pre>
-				<hr align='center' size='1' style='width:95%' />
-				<div id='steps'></div>
-			</div>
-			<div class='tabCont' id='treeTab'>
-				<table cellspacing='0' cellpadding='0' border='0' width='100%'>
-					<tr>
-						<td align='left' nowrap='nowrap' valign='top' width='15%'>
-							<h4>Node Contents</h4>
-							<div id='nodeData'><i>Select a node</i></div>
-						</td>
-						<td align='center' width='85%'>
-							<div id='treeVis'></div>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div class='tabCont' id='aboutTab'>
-				<h2 align='center'>XPath Evaluator</h2>
-				<h4 align='center'>Version 1.0</h4>
-				<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis congue pellentesque luctus. Duis iaculis euismod semper. Pellentesque et tristique metus. Ut lectus ligula, eleifend ut hendrerit quis, posuere in turpis. Donec in velit est, vitae rutrum massa. Quisque condimentum eleifend metus euismod congue. Maecenas quis nisi dui. Nulla quis eros eget lectus euismod sollicitudin eget at urna. Quisque nec libero at urna euismod sagittis. In et lorem justo. Vestibulum non purus justo, vel semper magna. In hac habitasse platea dictumst. Vestibulum bibendum lobortis gravida. Aenean viverra pulvinar metus, suscipit dapibus tortor ultrices a. Sed adipiscing magna eu tortor commodo dapibus. Donec vel urna sollicitudin risus sagittis dictum vel in velit. Phasellus sagittis nibh quam, et elementum eros. Vivamus tristique erat eu nulla congue vel accumsan tellus adipiscing. Nam enim nibh, mattis sit amet semper a, ornare non velit.<br /><br />
-				Phasellus diam arcu, adipiscing quis bibendum ut, pulvinar vel nibh. Nulla blandit viverra egestas. Nunc feugiat blandit dolor, et pretium purus aliquet in. Duis at quam dui, quis tempus arcu. Praesent ut dapibus ipsum. Quisque metus ligula, pellentesque id mattis sit amet, consectetur eu nulla. Nullam scelerisque urna sed magna luctus in lacinia urna egestas. Praesent sit amet tempor arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean consectetur urna nec sapien hendrerit tristique. In id tellus ac neque porta gravida. Mauris cursus, nisl eget mattis porttitor, libero purus porta augue, ut dictum lacus erat in sem. Proin elementum porttitor orci sit amet varius. Quisque volutpat convallis orci, vel blandit nisl faucibus quis. Nulla malesuada mi sit amet metus convallis dignissim. Aenean id elit quis mauris tincidunt feugiat. Vestibulum a sapien in lacus lacinia pellentesque. Nunc vestibulum lobortis elit, vitae vehicula arcu tristique ac.</div>
-			</div>
+		<div align='center' class='buttons'>
+			<div class='button white load'>Load</div>
+			<div class='button white simplemodal-close'>Cancel</div>
 		</div>
+	</div>
+	<div class='dialog' id='aboutDialog'>
+		<h2 align='center'>XPath Evaluator</h2>
+		<h4 align='center'>Version 1.0</h4>
+		<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis congue pellentesque luctus. Duis iaculis euismod semper. Pellentesque et tristique metus. Ut lectus ligula, eleifend ut hendrerit quis, posuere in turpis. Donec in velit est, vitae rutrum massa. Quisque condimentum eleifend metus euismod congue. Maecenas quis nisi dui. Nulla quis eros eget lectus euismod sollicitudin eget at urna. Quisque nec libero at urna euismod sagittis. In et lorem justo. Vestibulum non purus justo, vel semper magna. In hac habitasse platea dictumst. Vestibulum bibendum lobortis gravida. Aenean viverra pulvinar metus, suscipit dapibus tortor ultrices a. Sed adipiscing magna eu tortor commodo dapibus. Donec vel urna sollicitudin risus sagittis dictum vel in velit. Phasellus sagittis nibh quam, et elementum eros. Vivamus tristique erat eu nulla congue vel accumsan tellus adipiscing. Nam enim nibh, mattis sit amet semper a, ornare non velit.<br /><br />
+		Phasellus diam arcu, adipiscing quis bibendum ut, pulvinar vel nibh. Nulla blandit viverra egestas. Nunc feugiat blandit dolor, et pretium purus aliquet in. Duis at quam dui, quis tempus arcu. Praesent ut dapibus ipsum. Quisque metus ligula, pellentesque id mattis sit amet, consectetur eu nulla. Nullam scelerisque urna sed magna luctus in lacinia urna egestas. Praesent sit amet tempor arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean consectetur urna nec sapien hendrerit tristique. In id tellus ac neque porta gravida. Mauris cursus, nisl eget mattis porttitor, libero purus porta augue, ut dictum lacus erat in sem. Proin elementum porttitor orci sit amet varius. Quisque volutpat convallis orci, vel blandit nisl faucibus quis. Nulla malesuada mi sit amet metus convallis dignissim. Aenean id elit quis mauris tincidunt feugiat. Vestibulum a sapien in lacus lacinia pellentesque. Nunc vestibulum lobortis elit, vitae vehicula arcu tristique ac.</div>
 	</div>
 </body>
 </html>
