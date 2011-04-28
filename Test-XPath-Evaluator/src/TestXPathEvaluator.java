@@ -20,7 +20,7 @@ public class TestXPathEvaluator {
 	/*
 	 * Induce a sleep time for demonstration to slow down the tests.
 	 */
-	static long sleepTime = 0; // 750;
+	static long sleepTime = 1500; // 750;
 
 	@BeforeClass
 	public static void oneTimeSetUp() throws InterruptedException {
@@ -53,33 +53,143 @@ public class TestXPathEvaluator {
 	/*
 	 * All node elements within the current context.
 	 */
-	@Ignore
+	@Ignore("TypeError: XML descendants internal method called on incompatible Object(xParser.js (line 102)) - return eval('this.'+str+';'); (xParser.js (line 98))")
 	@Test
 	public void testDotSlashNode() throws Exception {
 		executeQuery("./author");
 		assertEquals("[]", result.getText());
 
 		executeQuery("./bookstore");
-		assertEquals("[]", result.getText()); // TODO everything
+		assertEquals(
+				"{"
+						+ " \"@specialty\": \"novel\","
+						+ " \"book\": [{"
+						+ " \"@style\": \"autobiography\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " },"
+						+ " \"price\": \"12\""
+						+ " }, {"
+						+ " \"@style\": \"textbook\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " },"
+						+ " \"editor\": {"
+						+ " \"first-name\": \"Britney\","
+						+ " \"last-name\": \"Bob\""
+						+ " },"
+						+ " \"price\": \"55\""
+						+ " }, {"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
+						+ " \"magazine\": {" + " \"@style\": \"glossy\","
+						+ " \"@frequency\": \"monthly\","
+						+ " \"price\": \"2.50\"," + " \"subscription\": {"
+						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
+						+ " }" + " }", result.getText());
 	}
 
 	/*
 	 * All node elements within the current context.
 	 */
-	@Ignore
 	@Test
 	public void testNode() throws Exception {
 		executeQuery("author");
 		assertEquals("[]", result.getText());
 
 		executeQuery("bookstore");
-		assertEquals("[]", result.getText()); // TODO everything
+		assertEquals(
+				"{"
+						+ " \"@specialty\": \"novel\","
+						+ " \"book\": [{"
+						+ " \"@style\": \"autobiography\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " },"
+						+ " \"price\": \"12\""
+						+ " }, {"
+						+ " \"@style\": \"textbook\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " },"
+						+ " \"editor\": {"
+						+ " \"first-name\": \"Britney\","
+						+ " \"last-name\": \"Bob\""
+						+ " },"
+						+ " \"price\": \"55\""
+						+ " }, {"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
+						+ " \"magazine\": {" + " \"@style\": \"glossy\","
+						+ " \"@frequency\": \"monthly\","
+						+ " \"price\": \"2.50\"," + " \"subscription\": {"
+						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
+						+ " }" + " }", result.getText());
 	}
 
 	/*
 	 * All <first.name> elements within the current context.
 	 */
-	@Ignore
 	@Test
 	public void testNodeDotNode() throws Exception {
 		executeQuery("first.name");
@@ -89,42 +199,203 @@ public class TestXPathEvaluator {
 	/*
 	 * The document element (<bookstore>) of this document.
 	 */
-	@Ignore
 	@Test
 	public void testRootNode() throws Exception {
 		executeQuery("/bookstore");
-		assertEquals("[]", result.getText());
+		assertEquals(
+				"{"
+						+ " \"@specialty\": \"novel\","
+						+ " \"book\": [{"
+						+ " \"@style\": \"autobiography\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " },"
+						+ " \"price\": \"12\""
+						+ " }, {"
+						+ " \"@style\": \"textbook\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " },"
+						+ " \"editor\": {"
+						+ " \"first-name\": \"Britney\","
+						+ " \"last-name\": \"Bob\""
+						+ " },"
+						+ " \"price\": \"55\""
+						+ " }, {"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
+						+ " \"magazine\": {" + " \"@style\": \"glossy\","
+						+ " \"@frequency\": \"monthly\","
+						+ " \"price\": \"2.50\"," + " \"subscription\": {"
+						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
+						+ " }" + " }", result.getText());
 	}
 
 	/*
 	 * All <author> elements in the document.
 	 */
-	@Ignore
 	@Test
 	public void testDoubleSlashNode() throws Exception {
+		executeQuery("//bookstore");
+		assertEquals(
+				"[{"
+						+ " \"@specialty\": \"novel\","
+						+ " \"book\": [{"
+						+ " \"@style\": \"autobiography\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " },"
+						+ " \"price\": \"12\""
+						+ " }, {"
+						+ " \"@style\": \"textbook\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " },"
+						+ " \"editor\": {"
+						+ " \"first-name\": \"Britney\","
+						+ " \"last-name\": \"Bob\""
+						+ " },"
+						+ " \"price\": \"55\""
+						+ " }, {"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
+						+ " \"magazine\": {" + " \"@style\": \"glossy\","
+						+ " \"@frequency\": \"monthly\","
+						+ " \"price\": \"2.50\"," + " \"subscription\": {"
+						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
+						+ " }" + " }]", result.getText());
 		executeQuery("//author");
-		assertEquals("[]", result.getText());
+		assertEquals(
+				"[{"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " }, {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " }, {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " }]", result.getText());
 	}
 
 	/*
 	 * All <book> elements whose style attribute value is equal to the specialty
 	 * attribute value of the <bookstore> element at the root of the document.
 	 */
-	@Ignore
 	@Test
 	public void testNodeWithParameters() throws Exception {
-		executeQuery("book[/bookstore/@specialty=@style]");
-		assertEquals("[]", result.getText());
+		executeQuery("//book[/bookstore/@specialty=@style]");
+		assertEquals(
+				"[{"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " }" + " } " + "}]",
+				result.getText());
 	}
 
 	/*
 	 * All <first-name> elements that are children of an <author> element.
 	 */
-	@Ignore
 	@Test
 	public void testNodeSlashNode() throws Exception {
-		executeQuery("author/first-name");
-		assertEquals("[]", result.getText());
+		executeQuery("/bookstore/book/author/first-name");
+		assertEquals("[\"Joe\", \"Mary\", \"Toni\"]", result.getText());
 	}
 
 	/*
@@ -132,21 +403,69 @@ public class TestXPathEvaluator {
 	 * (arbitrary descendants). Note that this is different from the expression
 	 * in the next row.
 	 */
-	@Ignore
 	@Test
 	public void testNodeDoubleSlashNode() throws Exception {
-		executeQuery("bookstore//title");
-		assertEquals("[]", result.getText());
+		executeQuery("bookstore//author");
+		assertEquals(
+				"[{"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " }, {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " }, {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " }]", result.getText());
 	}
 
 	/*
 	 * All node elements that are grandchildren of node elements.
 	 */
-	@Ignore
 	@Test
 	public void testNodeAsterickNode() throws Exception {
-		executeQuery("bookstore/*/title");
-		assertEquals("[]", result.getText());
+		executeQuery("bookstore/*/author");
+		assertEquals(
+				"[{"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " }, {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " }, {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " }]", result.getText());
 
 		executeQuery("book/*/last-name");
 		assertEquals("[]", result.getText());
@@ -156,12 +475,13 @@ public class TestXPathEvaluator {
 	 * All <emph> elements anywhere inside <excerpt> children of <book>
 	 * elements, anywhere inside the <bookstore> element.
 	 */
-	@Ignore
 	@Test
 	public void testNodeDoubleSlashNodeSlashNodeDoubleSlashNode()
 			throws Exception {
-		executeQuery("bookstore//book/excerpt//emph");
-		assertEquals("[]", result.getText());
+		executeQuery("bookstore//book/excerpt//p");
+		assertEquals(
+				"[\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"]",
+				result.getText());
 	}
 
 	/*
@@ -169,19 +489,34 @@ public class TestXPathEvaluator {
 	 * that this situation is essentially the only one in which the period
 	 * notation is required.
 	 */
-	@Ignore
+	@Ignore("TypeError: XML descendants internal method called on incompatible Object(xParser.js (line 102)) - return eval('this.'+str+';'); (xParser.js (line 98))")
 	@Test
 	public void testDotDoubleSlashNode() throws Exception {
-		executeQuery(".//title");
+		executeQuery(".//author");
 		assertEquals("[]", result.getText());
 	}
 
 	/*
 	 * All elements that are the children of <author> elements.
 	 */
-	@Ignore
 	@Test
 	public void testNodeAsterick() throws Exception {
+		executeQuery("bookstore/book/author/*");
+		assertEquals(
+				"[\"Joe\", \"Bob\", \"Trenton Literary Review Honorable Mention\", \"Mary\", \"Bob\","
+						+ " {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }, \"Toni\", \"Bob\", [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }], \"Pulitzer\", [\"Still in Trenton\", \"Trenton Forever\"]]",
+				result.getText());
+
 		executeQuery("author/*");
 		assertEquals("[]", result.getText());
 	}
@@ -189,21 +524,127 @@ public class TestXPathEvaluator {
 	/*
 	 * All grandchildren elements of the current context.
 	 */
-	@Ignore
 	@Test
 	public void testAsterickSlashAsterick() throws Exception {
 		executeQuery("*/*");
-		assertEquals("[]", result.getText());
+		assertEquals(
+				"[\"novel\", [{"
+						+ " \"@style\": \"autobiography\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " },"
+						+ " \"price\": \"12\""
+						+ " }, {"
+						+ " \"@style\": \"textbook\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " },"
+						+ " \"editor\": {"
+						+ " \"first-name\": \"Britney\","
+						+ " \"last-name\": \"Bob\""
+						+ " },"
+						+ " \"price\": \"55\""
+						+ " }, {"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " }" + " } " + "}],"
+						+ " {" + " \"@style\": \"glossy\","
+						+ " \"@frequency\": \"monthly\","
+						+ " \"price\": \"2.50\"," + " \"subscription\": {"
+						+ " \"@price\": \"24\"," + " \"@per\": \"year\"" + " }"
+						+ " }]", result.getText());
 	}
 
 	/*
 	 * All elements with the specialty attribute.
 	 */
-	@Ignore
 	@Test
 	public void testAsterickAttribute() throws Exception {
 		executeQuery("*[@specialty]");
-		assertEquals("[]", result.getText());
+		assertEquals(
+				"[\"novel\", [{"
+						+ " \"@style\": \"autobiography\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Joe\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
+						+ " },"
+						+ " \"price\": \"12\""
+						+ " }, {"
+						+ " \"@style\": \"textbook\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"publication\": {"
+						+ " \"#text\": \"Selected Short Stories of\","
+						+ " \"first-name\": \"Mary\","
+						+ " \"last-name\": \"Bob\""
+						+ " }"
+						+ " },"
+						+ " \"editor\": {"
+						+ " \"first-name\": \"Britney\","
+						+ " \"last-name\": \"Bob\""
+						+ " },"
+						+ " \"price\": \"55\""
+						+ " }, {"
+						+ " \"@style\": \"novel\","
+						+ " \"@id\": \"myfave\","
+						+ " \"author\": {"
+						+ " \"first-name\": \"Toni\","
+						+ " \"last-name\": \"Bob\","
+						+ " \"degree\": [{"
+						+ " \"@from\": \"Trenton U\","
+						+ " \"#text\": \"B.A.\""
+						+ " }, {"
+						+ " \"@from\": \"Harvard\","
+						+ " \"#text\": \"Ph.D.\""
+						+ " }],"
+						+ " \"award\": \"Pulitzer\","
+						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
+						+ " },"
+						+ " \"price\": {"
+						+ " \"@intl\": \"Canada\","
+						+ " \"@exchange\": \"0.7\","
+						+ " \"#text\": \"6.50\""
+						+ " },"
+						+ " \"excerpt\": {"
+						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
+						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
+						+ " \"definition\": \"misery\"" + " }" + " }" + " }],"
+						+ " {" + " \"@style\": \"glossy\","
+						+ " \"@frequency\": \"monthly\","
+						+ " \"price\": \"2.50\"," + " \"subscription\": {"
+						+ " \"@price\": \"24\"," + " \"@per\": \"year\"" + " }"
+						+ " }]", result.getText());
 	}
 
 	/*
