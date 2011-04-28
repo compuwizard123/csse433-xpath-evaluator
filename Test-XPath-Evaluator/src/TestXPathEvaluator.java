@@ -18,7 +18,7 @@ public class TestXPathEvaluator {
 	static WebElement result;
 
 	/*
-	 * Uncomment for demonstration
+	 * Induce a sleep time for demonstration to slow down the tests.
 	 */
 	static long sleepTime = 0; // 750;
 
@@ -810,6 +810,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the forty-second <figure> element in the document.
+	 */
 	@Ignore
 	@Test
 	public void testRootDescendantPosition() throws Exception {
@@ -817,6 +820,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the second <section> element contained in the fifth <chapter>
+	 * element of the <doc> document element.
+	 */
 	@Ignore
 	@Test
 	public void testRootChildSlashChildPosition() throws Exception {
@@ -827,6 +834,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select all <para> children of the context node that have a typeattribute
+	 * with the value "warning".
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorAttributeValue() throws Exception {
@@ -834,6 +845,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the fifth <para> child of the context node that has a
+	 * typeattribute with the value "warning".
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorAttributeValueSelectorPosition()
@@ -842,6 +857,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the fifth <para> child of the context node if that child has a
+	 * type attribute with the value "warning".
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorPositionSelectorAttributeValue()
@@ -850,6 +869,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <chapter> children of the context node that have one or more
+	 * <title> children with string value equal to "Introduction".
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorChildValue() throws Exception {
@@ -857,6 +880,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <chapter> children of the context node that have one or more
+	 * <title> children.
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorChild() throws Exception {
@@ -864,6 +891,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <chapter> and <appendix> children of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildAsterickSelectorSelfOrSelf() throws Exception {
@@ -871,6 +901,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the last <chapter> or <appendix> child of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildAsterickSelectorSelfOrSelfSelectorPositionLast()
