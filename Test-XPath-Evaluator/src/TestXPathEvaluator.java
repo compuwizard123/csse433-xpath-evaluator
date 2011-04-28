@@ -50,26 +50,35 @@ public class TestXPathEvaluator {
 	 * http://msdn.microsoft.com/en-us/library/ms256086.aspx
 	 */
 
+	/*
+	 * All node elements within the current context.
+	 */
 	@Ignore
 	@Test
 	public void testDotSlashNode() throws Exception {
 		executeQuery("./author");
 		assertEquals("[]", result.getText());
 
-		executeQuery("./first-name");
-		assertEquals("[]", result.getText());
+		executeQuery("./bookstore");
+		assertEquals("[]", result.getText()); // TODO everything
 	}
 
+	/*
+	 * All node elements within the current context.
+	 */
 	@Ignore
 	@Test
 	public void testNode() throws Exception {
 		executeQuery("author");
 		assertEquals("[]", result.getText());
 
-		executeQuery("first-name");
-		assertEquals("[]", result.getText());
+		executeQuery("bookstore");
+		assertEquals("[]", result.getText()); // TODO everything
 	}
 
+	/*
+	 * All <first.name> elements within the current context.
+	 */
 	@Ignore
 	@Test
 	public void testNodeDotNode() throws Exception {
@@ -77,13 +86,19 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The document element (<bookstore>) of this document.
+	 */
 	@Ignore
 	@Test
-	public void testSlashNode() throws Exception {
+	public void testRootNode() throws Exception {
 		executeQuery("/bookstore");
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements in the document.
+	 */
 	@Ignore
 	@Test
 	public void testDoubleSlashNode() throws Exception {
@@ -91,6 +106,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <book> elements whose style attribute value is equal to the specialty
+	 * attribute value of the <bookstore> element at the root of the document.
+	 */
 	@Ignore
 	@Test
 	public void testNodeWithParameters() throws Exception {
@@ -98,6 +117,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <first-name> elements that are children of an <author> element.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashNode() throws Exception {
@@ -105,6 +127,11 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <title> elements one or more levels deep in the <bookstore> element
+	 * (arbitrary descendants). Note that this is different from the expression
+	 * in the next row.
+	 */
 	@Ignore
 	@Test
 	public void testNodeDoubleSlashNode() throws Exception {
@@ -112,6 +139,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All node elements that are grandchildren of node elements.
+	 */
 	@Ignore
 	@Test
 	public void testNodeAsterickNode() throws Exception {
@@ -122,6 +152,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <emph> elements anywhere inside <excerpt> children of <book>
+	 * elements, anywhere inside the <bookstore> element.
+	 */
 	@Ignore
 	@Test
 	public void testNodeDoubleSlashNodeSlashNodeDoubleSlashNode()
@@ -130,6 +164,11 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <title> elements one or more levels deep in the current context. Note
+	 * that this situation is essentially the only one in which the period
+	 * notation is required.
+	 */
 	@Ignore
 	@Test
 	public void testDotDoubleSlashNode() throws Exception {
@@ -137,6 +176,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All elements that are the children of <author> elements.
+	 */
 	@Ignore
 	@Test
 	public void testNodeAsterick() throws Exception {
@@ -144,6 +186,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All grandchildren elements of the current context.
+	 */
 	@Ignore
 	@Test
 	public void testAsterickSlashAsterick() throws Exception {
@@ -151,6 +196,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All elements with the specialty attribute.
+	 */
 	@Ignore
 	@Test
 	public void testAsterickAttribute() throws Exception {
@@ -158,6 +206,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The style attribute of the current context.
+	 */
 	@Ignore
 	@Test
 	public void testAttribute() throws Exception {
@@ -165,6 +216,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The exchange attribute on <price> elements within the current context.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashAttribute() throws Exception {
@@ -175,6 +229,11 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Returns an empty node set, because attributes do not contain element
+	 * children. This expression is allowed by the XML Path Language (XPath)
+	 * grammar, but is not strictly valid.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashAttributeSlashNode() throws Exception {
@@ -182,6 +241,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <book> elements with style attributes, of the current context.
+	 */
 	@Ignore
 	@Test
 	public void testNodeAttribute() throws Exception {
@@ -189,6 +251,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All attributes of the current element context.
+	 */
 	@Ignore
 	@Test
 	public void testAttributeAsterick() throws Exception {
@@ -196,6 +261,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The first <author> element in the current context node.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelector() throws Exception {
@@ -203,6 +271,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The third <author> element that has a <first-name> child.
+	 */
 	@Ignore
 	@Test
 	public void testDoubleSelector() throws Exception {
@@ -213,6 +284,41 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The <book> element from the my namespace.
+	 */
+	@Ignore
+	@Test
+	public void testNamespaceNode() throws Exception {
+		executeQuery("my:book");
+		assertEquals("[]", result.getText());
+	}
+
+	/*
+	 * All elements from the my namespace.
+	 */
+	@Ignore
+	@Test
+	public void testNamespaceAsterick() throws Exception {
+		executeQuery("my:*");
+		assertEquals("[]", result.getText());
+	}
+
+	/*
+	 * All attributes from the my namespace (this does not include unqualified
+	 * attributes on elements from the my namespace).
+	 */
+	@Ignore
+	@Test
+	public void testAttributeNamespaceAsterick() throws Exception {
+		executeQuery("@my:*");
+		assertEquals("[]", result.getText());
+	}
+
+	/*
+	 * All attributes from the my namespace (this does not include unqualified
+	 * attributes on elements from the my namespace).
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashSelector() throws Exception {
@@ -220,6 +326,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * ] The first <y> child of each <x>.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashSelectorPosition() throws Exception {
@@ -227,6 +336,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The first <y> from the entire set of <y> children of <x> elements.
+	 */
 	@Ignore
 	@Test
 	public void testGroupingSelector() throws Exception {
@@ -234,6 +346,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The second <y> child of the first <x>.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorSlashNodeSelector() throws Exception {
@@ -241,6 +356,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The last <book> element of the current context node.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorLast() throws Exception {
@@ -248,6 +366,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The last <author> child of each <book> element of the current context
+	 * node.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashNodeSelectorLast() throws Exception {
@@ -255,6 +377,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The last <author> element from the entire set of <author> children of
+	 * <book> elements of the current context node.
+	 */
 	@Ignore
 	@Test
 	public void testGroupingSelectorLast() throws Exception {
@@ -262,6 +388,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <book> elements that contain at least one <excerpt> element child.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorNode() throws Exception {
@@ -269,6 +398,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <title> elements that are children of <book> elements that also
+	 * contain at least one <excerpt> element child.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorNodeSlashNode() throws Exception {
@@ -276,6 +409,11 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain at least one <degree> element child,
+	 * and that are children of <book> elements that also contain at least one
+	 * <excerpt> element.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorNodeSlashNodeSelectorNode() throws Exception {
@@ -283,6 +421,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <book> elements that contain <author> children that in turn contain
+	 * at least one <degree> child.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorNodeSlashNodeEndSelector() throws Exception {
@@ -290,6 +432,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain at least one <degree> element child
+	 * and at least one <award> element child.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorAnd() throws Exception {
@@ -297,6 +443,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain at least one <degree> or <award> and
+	 * at least one <publication> as the children
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorGroupOrAnd() throws Exception {
@@ -304,6 +454,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain at least one <degree> element child
+	 * and that contain no <publication> element children.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorAndNot() throws Exception {
@@ -311,6 +465,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain at least one <publication> element
+	 * child and contain neither <degree> nor <award> element children.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorNotGroupOrAnd() throws Exception {
@@ -318,6 +476,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain at least one <last-name> element child
+	 * with the value Bob.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorValue() throws Exception {
@@ -328,6 +490,11 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements where the first <last-name> child element has the
+	 * value Bob. Note that this is equivalent to the expression in the next
+	 * row.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorSelectorValue() throws Exception {
@@ -335,6 +502,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements where the first <last-name> child element has the
+	 * value Bob.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorSelectorPositionValue() throws Exception {
@@ -342,6 +513,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <degree> elements where the from attribute is not equal to "Harvard".
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorAttributeValue() throws Exception {
@@ -352,6 +526,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements whose value is Matthew Bob.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorDotValue() throws Exception {
@@ -359,6 +536,11 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that contain a <last-name> child element whose
+	 * value is Bob, and a <price> sibling element whose value is greater than
+	 * 50.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorAndValue() throws Exception {
@@ -369,6 +551,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The first three books (1, 2, 3).
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorPositionValue() throws Exception {
@@ -379,6 +564,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * All <author> elements that do no contain <last-name> child elements with
+	 * the value Bob.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorNotValue() throws Exception {
@@ -386,6 +575,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * all author elements containing any child element whose value is Bob.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSelectorAsterickValue() throws Exception {
@@ -393,6 +585,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The text node in each <p> element in the context node.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashText() throws Exception {
@@ -400,6 +595,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The second text node in each <p> element in the context node.
+	 */
 	@Ignore
 	@Test
 	public void testNodeSlashTextSelector() throws Exception {
@@ -407,6 +605,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The nearest <book> ancestor of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testAncestorSelector() throws Exception {
@@ -414,6 +615,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The nearest <book> ancestor of the context node and this <book> element
+	 * has an <author> element as its child.
+	 */
 	@Ignore
 	@Test
 	public void testAncestorSelectorSelector() throws Exception {
@@ -421,6 +626,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * The nearest <author> ancestor in the current context and this <author>
+	 * element is a child of a <book> element.
+	 */
 	@Ignore
 	@Test
 	public void testAncestorAncestorSelector() throws Exception {
@@ -428,29 +637,12 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
-	@Ignore
-	@Test
-	public void testNamespaceNode() throws Exception {
-		executeQuery("my:book");
-		assertEquals("[]", result.getText());
-	}
-
-	@Ignore
-	@Test
-	public void testNamespaceAsterick() throws Exception {
-		executeQuery("my:*");
-		assertEquals("[]", result.getText());
-	}
-
-	@Ignore
-	@Test
-	public void testAttributeNamespaceAsterick() throws Exception {
-		executeQuery("@my:*");
-		assertEquals("[]", result.getText());
-	}
-
 	/*
 	 * Test examples from http://msdn.microsoft.com/en-us/library/ms256236.aspx
+	 */
+
+	/*
+	 * Select all the children of the context node, whatever their node type.
 	 */
 	@Ignore
 	@Test
@@ -459,6 +651,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the name attribute of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testAttributeLocation() throws Exception {
@@ -466,6 +661,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select all the attributes of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testAttributeLocationAsterick() throws Exception {
@@ -473,6 +671,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <para> element descendants of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testDescendant() throws Exception {
@@ -480,6 +681,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select all <div> ancestors of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testAncestor() throws Exception {
@@ -487,6 +691,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <div> ancestors of the context node and, if the context node
+	 * is a <div> element, select the context node as well.
+	 */
 	@Ignore
 	@Test
 	public void testAncestorOrSelf() throws Exception {
@@ -494,6 +702,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <para> element descendants of the context node and, if the
+	 * context node is a <para> element, select the context node as well.
+	 */
 	@Ignore
 	@Test
 	public void testDescendantOrSelf() throws Exception {
@@ -501,6 +713,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the context node if it is a <para> element; otherwise select
+	 * nothing.
+	 */
 	@Ignore
 	@Test
 	public void testSelf() throws Exception {
@@ -508,6 +724,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the <para> element descendants of the <chapter> element children
+	 * of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildSlashDescendant() throws Exception {
@@ -515,6 +735,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select all <para> grandchildren of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildAsterickSlashChild() throws Exception {
@@ -522,6 +745,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the document root (which is always the parent of the document
+	 * element).
+	 */
 	@Ignore
 	@Test
 	public void testRoot() throws Exception {
@@ -529,6 +756,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select all the <para> elements in the same document as the context node.
+	 */
 	@Ignore
 	@Test
 	public void testRootDescendant() throws Exception {
@@ -536,6 +766,10 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select all the <item> elements that have an <olist> parent and that are
+	 * in the same document as the context node.
+	 */
 	@Ignore
 	@Test
 	public void testRootDescendantSlashChild() throws Exception {
@@ -543,6 +777,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the first <para> child of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorPosition() throws Exception {
@@ -553,6 +790,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the last <para> child of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorPositionLast() throws Exception {
@@ -560,6 +800,9 @@ public class TestXPathEvaluator {
 		assertEquals("[]", result.getText());
 	}
 
+	/*
+	 * Select the next-to-last <para> child of the context node.
+	 */
 	@Ignore
 	@Test
 	public void testChildSelectorPositionLastMinus1() throws Exception {
