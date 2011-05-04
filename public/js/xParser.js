@@ -37,35 +37,43 @@ var xParseRE =
 	"(^|\\[|\\s)\\/" : "$1root().",
 	"\\/" : '',
 
+	// Dot
+	"\\.\\.(\\$|\/)" : ".$1",
+
 	// Dot dot
 	"(\\.{2,3})(\\$|\/)" : ".parent().$2",
 
 	// Predicates!
 	"([^\\=\\>\\<\\!])\\=([^\\=])" : '$1==$2',
-	"\\[" : '$(function(node){ with(node){ return(',
-	"\\]" : '); }}).',
+	"\\[" : '$(function(node){ with(node){ return !isEmpty(',
+	"\\]" : ');}}).',
 
 	// Cleanup remaining dots and slashes
 	"\\(\\." : '(',
-	"(\\)\\.|\\])(?!\\$|\\p)" : '$1jsonObj',
+	"(\\)\\.|\\])(?!\\$|\\p)" : "$1jsonObj",
+	"return\\(([^\\)]+)?((\\$\\('(@[A-Za-z0-9]*)'\\))\\.jsonObj)([^\\)]+)?\\)" : "return($1$3$5)",
 
 	// Count predicate helper
 	"count\\(([^\\)]+)\\)" : "count('$1')",
 
 	// Not predicate helper
-	"not\\(([^\\)]+)\\)" : "not($1)"
+	"not\\(([^\\)]+)\\)" : "not($1)",
+
+	// Crap left still...
+	"^\\." : ""
 }
 
-function xParser(jsonObj, parNode, pName)
+function xParser(jsonObj, parNode, pName, message, callback)
 {
-	this.jsonObj = jsonObj || null;
-	this.parNode = parNode || null;
-	this.pName   = pName   || null;
+	this.jsonObj  = jsonObj  || null;
+	this.parNode  = parNode  || null;
+	this.pName    = pName    || null;
+	this.message  = message  || 'root';
+	this.callback = callback || null;
 }
 
 xParser.prototype =
 {
-
 	/* Parse Handler
 	 * Performs a string parsing method of converting an XPath expression into
 	 * a suitable JavaScript chained-method to be evaluated on the xParser object
@@ -79,6 +87,9 @@ xParser.prototype =
 
 	parse : function(str)
 	{
+		for (var x in this.jsonObj)
+			this.pName = x;
+
 		var quotes = /(\'[^\']*\'|\"[^\"]*\")/;
 		var temp   = [];
 
@@ -89,7 +100,10 @@ xParser.prototype =
 		}
 
 		for (var x in xParseRE)
+		{
 			str = str.replace(new RegExp(x, 'gi'), xParseRE[x]);
+			// console.log(str)
+		}
 
 		str = str.replace(/\%(\d+)\%/g, function(str, p1){ return temp[p1]; }).replace(/\.jsonObj$/, '');
 		console.log(str);
@@ -120,15 +134,18 @@ xParser.prototype =
 	{
 		var self = this;
 		var res  = null;
+		var msg  = null;
 
 		if (this.jsonObj && typeof(str) !=' undefined' && str !== null)
 			switch (typeof(str))
 			{
 				case 'number':
 					res = this.jsonObj[str] || null;
+					msg = 'Number?';
 					break;
 				case 'function':
 					res = this.iterate(str).jsonObj;
+					msg = 'Iterate '+this.pName+' against the predicate';
 					break;
 				case 'string':
 					var items = str.split('/');
@@ -140,21 +157,28 @@ xParser.prototype =
 						var arr   = [];
 
 						for (var prop in self.jsonObj)
+						{
 							if (typeof(self.jsonObj[prop]) != 'function')
 							{
 								if (isArr && (arguments.callee.caller != this.$$))
 									arr = arr.concat(this.regexp(item, self.jsonObj[prop]));
 								else if (item.test(prop))
+								{
+									console.log('passed!', prop, item.toString());
 									arr.push(self.jsonObj[prop]);
+								}
 							}
+						}
 
-						self = new xParser((arr.length > 1) ? arr : ((arr.length == 1) ? arr[0] : arr), self, items[i]);
+						console.log(arr);
+						self = new xParser((arr.length > 1) ? arr : ((arr.length == 1) ? arr[0] : arr), self, items[i], 'Navigate current node for: '+str, this.callback);
+						msg  = 'Navigate current node for: '+str;
 					}
 
 					return self;
 			}
 
-		return new xParser(res, self);
+		return new xParser(res, self, null, msg);
 	},
 
 	/* $$ Handler
@@ -182,10 +206,10 @@ xParser.prototype =
 		// Loop through collect results from the query on each property
 		for (var prop in this.jsonObj)
 			if (typeof(this.jsonObj[prop]) == 'object')
-				arr = arr.concat(new xParser(this.jsonObj[prop], this, prop).$$(str).jsonObj);
+				arr = arr.concat(new xParser(this.jsonObj[prop], this, prop, 'skeeet', this.callback).$$(str).jsonObj);
 
 		// Return new xParser object
-		return new xParser(arr, this);
+		return new xParser(arr, this, str, 'Search all subnodes for: '+str);
 	},
 
 	/* Iterator Handler
@@ -202,19 +226,20 @@ xParser.prototype =
 	iterate : function(callback)
 	{
 		var arr = [];
-		if (typeof(callback) == 'string')
-			eval('callback = function(node){ with(node){ return('+callback+'); }}');
-
 		for (var prop in this.jsonObj)
 		{
-			var item   = new xParser(this.jsonObj[prop], this, prop);
+			var item   = new xParser(this.jsonObj[prop], this, prop, 'Check node ('+prop+') to see if passes predicate', this.callback);
 			item.index = prop;
 
-			if (callback(item))
+			var res = callback(item);
+			if (res !== false)
+			{
+				console.log('callback passed', item, prop, res);
 				arr.push(this.jsonObj[prop]);
+			}
 		}
 
-		return new xParser(arr, this);
+		return new xParser(arr, this, null, 'Search current node to check all children against the predicate', this.callback);
 	},
 
 	/* Regex Handler
@@ -306,4 +331,21 @@ xParser.prototype =
 	{
 		return this.index;
 	}
+}
+
+function isEmpty(mixed)
+{
+	var key;
+	if (mixed === "" || mixed === 0 || mixed === "0" || mixed === null || mixed === false || typeof mixed === 'undefined' || (mixed instanceof Array && mixed.length == 0))
+		return true;
+
+	if (typeof mixed_var == 'object')
+	{
+		for (key in mixed)
+			return false;
+
+		return true;
+	}
+
+	return false;
 }

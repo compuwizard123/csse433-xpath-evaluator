@@ -69,9 +69,15 @@ function json2jit(data, root)
 		return arr;
 	}
 
-	x = loop(data).shift();
-	if (root)
-		x.name = root;
+	x = loop(data);
+	console.log('viewTree', x, data);
+	x = x.shift();
+	try
+	{
+		if (root)
+			x.name = root;
+	}
+	catch(me){}
 
 	return x;
 }
@@ -150,7 +156,7 @@ $(document).ready(function()
 			if (obj.hasParent())
 				loopSteps(obj.parent());
 
-			$('ol', steps).append($('<li></li>').html('<pre>'+js_beautify($.toJSON(obj.jsonObj), {indent_size: 1, indent_char: '  '})+'</pre>'));
+			$('ol', steps).append($('<li></li>').html('<strong>'+obj.message+'</strong><br /><pre>'+js_beautify($.toJSON(obj.jsonObj), {indent_size: 1, indent_char: '  '})+'</pre>'));
 		}
 
 		// Error?
@@ -203,13 +209,33 @@ $(document).ready(function()
 					res = tmp;
 				}
 			}
+			else if (typeof(res) == 'string')
+			{
+				console.log('orginal r', r);
 
-			console.log(res);
+				// r    = r.root();
+				// res  = r.getJson() || res;
+				// root = getPname(r);
 
+				rt   = getPname(r.root());
+				ct   = getPname(r);
+
+				tmp     = {}
+				tmp[(ct[0] == '@') ? rt: ct] = (ct[0] == '@') ? {} : res;
+
+				if (ct[0] == '@')
+					tmp[rt][ct] = res;
+
+				res = tmp;
+
+				console.log('res/root', res, root);
+			}
+
+			console.log('res', res);
 			viewTree(res, root);
 			results.html(js_beautify($.toJSON(r.jsonObj), {indent_size: 1, indent_char: '  '}));
 			loopSteps(r);
-			console.log(r);
+			console.log('r', r);
 		}
 	});
 
