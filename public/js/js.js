@@ -6,7 +6,6 @@ function XPathEval()
 	var jsonStr   = false;
 	var xpath     = $('#xpath');
 	var graphWrap = $('#graphWrap');
-	var results   = $('.results', '#resultsWrap');
 	var steps     = $('.steps', '#resultsWrap');
 	var stepData  = $('#stepData');
 
@@ -198,8 +197,7 @@ function XPathEval()
 
 		stepData.hide();
 
-		// Clear out results and steps data
-		results.empty();
+		// Clear out steps data
 		$('#xmlResult').empty();
 
 		// Load xParser and parse it!
@@ -218,7 +216,6 @@ function XPathEval()
 		// Error?
 		if (r === false)
 		{
-			results.html('Error parsing XPath expression');
 			xpath.addClass('error').bind('keydown.xpath focus.xpath', function()
 			{
 				if ($(this).hasClass('error'))
@@ -236,7 +233,6 @@ function XPathEval()
 			console.log('r', r);
 			console.log('res', res);
 
-			results.html(js_beautify($.toJSON(res), {indent_size: 1, indent_char: '  '}));
 			$('#xmlResult').html(self.fixTags(self.formatXml(self.json2xml(res), {indent_size: 1, indent_char: '  '})));
 
 			if ($(this).hasClass('stepbystep'))

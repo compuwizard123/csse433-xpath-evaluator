@@ -25,7 +25,7 @@ var xParseRE =
 	// Does most of the node splitting via / into $ query calls
 	// Also checks for some sort of node/attribute as well
 	"([\\#\\*\\@a-z\\_][\\*a-z0-9_\\-\\.]*)(?=(?:\\s|$|\\[|\\]|\\/))" : "\$('$1').",
-	"\\[([0-9])+\\]" : "\$($1).",
+	"\\[([0-9]+)+\\]" : "\$($1).",
 
 	// Dot dot
 	"\\.\\." : "parent().",
@@ -140,6 +140,9 @@ xParser.prototype =
 			switch (typeof(str))
 			{
 				case 'number':
+					if (str >= this.jsonObj.length)	
+						return false;
+
 					res = this.jsonObj[str] || null;
 					msg = 'Number?';
 					break;
