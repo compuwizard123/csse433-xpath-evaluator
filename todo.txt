@@ -1,0 +1,8 @@
+Step by step
+\n unicode issue
+Parent node names (*)
+More test cases -- use xpath eval 2 for correctness?
+
+//@* | /@* | @* -- fail (json2jit)
+
+bookstore/@* -- works
