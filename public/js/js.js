@@ -14,7 +14,9 @@ function XPathEval()
 	this.UUID       = function(){ return (this.uuidGen()+this.uuidGen()+'-'+this.uuidGen()+'-'+this.uuidGen()+'-'+this.uuidGen()+'-'+this.uuidGen()+this.uuidGen()+this.uuidGen()); }
 	this.setMessage = function(msg, klass, init)
 	{
+		var dis  = this;
 		var self = $('#globalMessage').html(msg).attr('class', '').addClass(klass || '');
+
 		if (!init)
 		{
 			self.css('margin-left', $(window).width()/2-self.width()/2);
@@ -30,7 +32,7 @@ function XPathEval()
 				$(window).unbind('resize.xpath');
 			}, 5000));
 
-			$(window).unbind('resize.xpath').bind('resize.xpath', function(){ self.setMessage(msg, klass, !init); });
+			$(window).unbind('resize.xpath').bind('resize.xpath', function(){ dis.setMessage(msg, klass, !init); });
 		}
 		else
 		{
@@ -304,9 +306,16 @@ function XPathEval()
 		var maxIdx = resArr.length-1;
 
 		console.log('resArr', resArr);
+		stepData.data('timer', 0);
 		$('.prev, .next', stepData).addClass('disabled').unbind('click.xpath').bind('click.xpath', function(e, force)
 		{
-			var next = $(this).hasClass('next');
+			var next  = $(this).hasClass('next');
+			var timer = stepData.data('timer');
+			var now   = new Date().getTime();
+
+			// Slow it down?
+			if (timer > 0 && now-timer < 1500)
+				return;
 
 			// Disabled?
 			if ($(this).hasClass('disabled') && force !== true) return false;
@@ -321,9 +330,12 @@ function XPathEval()
 				self.viewTree(resArr[curIdx].json, resArr[curIdx].pnode);
 			}
 
-			// Update buttons
+			// Update buttons and timer
 			$('.prev', stepData)[(curIdx <= 0) ? 'addClass' : 'removeClass']('disabled');
 			$('.next', stepData)[(curIdx >= maxIdx) ? 'addClass' : 'removeClass']('disabled');
+
+			if (force !== true)
+				stepData.data('timer', now);
 		});
 
 		$('.next', stepData).trigger('click.xpath', [true]);
