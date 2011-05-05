@@ -17,13 +17,14 @@
 		<div align='center'>
 			<table cellpadding='0' cellspacing='0' width='95%'>
 				<tr>
-					<td align='left' valign='top' width='5%'>
+					<td align='left' nowrap='nowrap' valign='top' width='10%'>
 						<label for='xpath'>XPath</label>
 						<div class='buttons'>
-							<div class='button blue' id='evaluate'>Evaluate</div>
+							<div class='button blue xpathEval evaluate'>Evaluate</div>
+							<div class='button blue xpathEval stepbystep'>Step-by-Step</div>
 						</div>
 					</td>
-					<td align='center' valign='top' width='90%'><textarea id='xpath' style='width:90%;height:55px'>//bookstore/book/author</textarea></td>
+					<td align='center' valign='top' width='85%'><textarea id='xpath' style='width:90%;height:55px'>//bookstore/book/author</textarea></td>
 					<td align='center' nowrap='nowrap' valign='top' width='5%'>
 						<div class='buttons'>
 							<div class='button blue' id='loadXml'>Load XML</div>
@@ -34,9 +35,23 @@
 		</div>
 		<div align='center' class='seperator hide' id='graphWrap'>
 			<div id='treeGraph'></div>
+			<div id='stepData'>
+				<table cellpadding='0' cellspacing='0' width='95%'>
+					<tr>
+						<td align='left' valign='top' width='20%'><div class='button blue prev'>&laquo; Prev</div></td>
+						<td align='center' valign='top' width='60%'><div class='message'>Message</div></td>
+						<td align='right' valign='top' width='20%'><div class='button blue next'>Next &raquo;</div></td>
+					</tr>
+				</table>
+			</div>
 		</div>
 		<div align='left' class='seperator hide' id='resultsWrap'>
-			<pre class='results'></pre>
+			<table cellpadding='0' cellspacing='0' width='95%'>
+				<tr>
+					<td align='left' valign='top' width='50%'><pre class='results'></pre></td>
+					<td align='left' valign='top' width='50%'><pre id='xmlResult'></pre></td>
+				</tr>
+			</table>
 			<div class='seperator steps'></div>
 		</div>
 	</div>

@@ -68,7 +68,7 @@ function xParser(jsonObj, parNode, pName, message, callback)
 	this.jsonObj  = jsonObj  || null;
 	this.parNode  = parNode  || null;
 	this.pName    = pName    || null;
-	this.message  = message  || 'root';
+	this.message  = message  || 'Start at the root node of the XML';
 	this.callback = callback || null;
 }
 
@@ -153,7 +153,7 @@ xParser.prototype =
 					for (var i=0; i<items.length; i++)
 					{
 						var isArr = (self.jsonObj instanceof Array);
-						var item  = new RegExp('^'+items[i].replace(/\./i, '\\\.').replace(/\*/g, '.*')+'$');
+						var item  = new RegExp('^'+items[i].replace(/\./i, '\\\.').replace(/\*/g, '[^@](.+?)')+'$');
 						var arr   = [];
 
 						for (var prop in self.jsonObj)
@@ -164,13 +164,13 @@ xParser.prototype =
 									arr = arr.concat(this.regexp(item, self.jsonObj[prop]));
 								else if (item.test(prop))
 								{
-									console.log('passed!', prop, item.toString());
+									// console.log('passed!', prop, item.toString());
 									arr.push(self.jsonObj[prop]);
 								}
 							}
 						}
 
-						console.log(arr);
+						// console.log(arr);
 						self = new xParser((arr.length > 1) ? arr : ((arr.length == 1) ? arr[0] : arr), self, items[i], 'Navigate current node for: '+str, this.callback);
 						msg  = 'Navigate current node for: '+str;
 					}

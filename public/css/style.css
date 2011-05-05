@@ -17,6 +17,7 @@ a, a:link, a:active, a:hover, a:visited {color:#23A4FF;}
 .button.large {font-size:125%; padding:7px 12px;}
 .button.small:active {padding:4px 7px 2px; background-position:0 top;}
 .button.large:active {padding:8px 12px 6px; background-position:0 top;}
+.button.disabled {cursor:default; background-position:0 top; opacity:0.5;}
 
 /* Wrapper */
 #wrapper {background-color:#fff; border:1px solid #999; font-size:1.2em; margin:10px auto; padding:20px; width:92%; border-radius:5px; -moz-border-radius:5px; -khtml-border-radius:5px; -webkit-border-radius:5px;}
@@ -45,3 +46,5 @@ a, a:link, a:active, a:hover, a:visited {color:#23A4FF;}
 /* Global Message */
 #globalMessage {background:#BDE5F8 no-repeat 10px center; border:1px solid; color:#00529B; display:none; position:fixed; top:-1px; margin:0; padding:5px 10px; -moz-border-radius-bottomleft:5px; -moz-border-radius-bottomright:5px; -khtml-border-radius-bottomleft:5px; -khtml-border-radius-bottomright:5px; -webkit-border-bottom-left-radius:5px; -webkit-border-bottom-right-radius:5px;}
 #globalMessage.error {background-color:#FFBABA; color:#D8000C;}
+
+#stepData {display:none; margin-top:7px;}
