@@ -20,7 +20,7 @@ public class TestXPathEvaluator {
 	/*
 	 * Induce a sleep time for demonstration to slow down the tests.
 	 */
-	static long sleepTime = 1500; // 750;
+	static long sleepTime = 0; // 750;
 
 	@BeforeClass
 	public static void oneTimeSetUp() throws InterruptedException {
@@ -29,7 +29,7 @@ public class TestXPathEvaluator {
 		Thread.sleep(sleepTime);
 		query = driver.findElement(By.id("xpath"));
 		submitQuery = driver.findElement(By.id("evaluate"));
-		result = driver.findElement(By.className("results"));
+		result = driver.findElement(By.id("xmlResult"));
 
 		driver.findElement(By.id("loadXml")).click();
 		Thread.sleep(sleepTime);
@@ -53,70 +53,15 @@ public class TestXPathEvaluator {
 	/*
 	 * All node elements within the current context.
 	 */
-	@Ignore("TypeError: XML descendants internal method called on incompatible Object(xParser.js (line 102)) - return eval('this.'+str+';'); (xParser.js (line 98))")
 	@Test
 	public void testDotSlashNode() throws Exception {
 		executeQuery("./author");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 
 		executeQuery("./bookstore");
 		assertEquals(
-				"{"
-						+ " \"@specialty\": \"novel\","
-						+ " \"book\": [{"
-						+ " \"@style\": \"autobiography\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " },"
-						+ " \"price\": \"12\""
-						+ " }, {"
-						+ " \"@style\": \"textbook\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " },"
-						+ " \"editor\": {"
-						+ " \"first-name\": \"Britney\","
-						+ " \"last-name\": \"Bob\""
-						+ " },"
-						+ " \"price\": \"55\""
-						+ " }, {"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
-						+ " \"magazine\": {" + " \"@style\": \"glossy\","
-						+ " \"@frequency\": \"monthly\","
-						+ " \"price\": \"2.50\"," + " \"subscription\": {"
-						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
-						+ " }" + " }", result.getText());
+				"<bookstore specialty=\"novel\"> <book style=\"autobiography\"> <author> <first-name>Joe</first-name> <last-name>Bob</last-name> <award>Trenton Literary Review Honorable Mention</award> </author> <price>12</price> </book> <book style=\"textbook\"> <author> <first-name>Mary</first-name> <last-name>Bob</last-name> <publication>Selected Short Stories of<first-name>Mary</first-name> <last-name>Bob</last-name> </publication> </author> <editor> <first-name>Britney</first-name> <last-name>Bob</last-name> </editor> <price>55</price> </book> <book style=\"novel\" id=\"myfave\"> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author> <price intl=\"Canada\" exchange=\"0.7\">6.50</price> <excerpt> <p>It was a dark and stormy night.</p> <p>But then all nights in Trenton seem dark andstormy to someone who has gone through what<emph>I</emph> have.</p> <definition-list> <term>Trenton</term> <definition>misery</definition> </definition-list> </excerpt> </book> <magazine style=\"glossy\" frequency=\"monthly\"> <price>2.50</price> <subscription price=\"24\" per=\"year\"/> </magazine> </bookstore>",
+				result.getText());
 	}
 
 	/*
@@ -125,66 +70,12 @@ public class TestXPathEvaluator {
 	@Test
 	public void testNode() throws Exception {
 		executeQuery("author");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 
 		executeQuery("bookstore");
 		assertEquals(
-				"{"
-						+ " \"@specialty\": \"novel\","
-						+ " \"book\": [{"
-						+ " \"@style\": \"autobiography\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " },"
-						+ " \"price\": \"12\""
-						+ " }, {"
-						+ " \"@style\": \"textbook\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " },"
-						+ " \"editor\": {"
-						+ " \"first-name\": \"Britney\","
-						+ " \"last-name\": \"Bob\""
-						+ " },"
-						+ " \"price\": \"55\""
-						+ " }, {"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
-						+ " \"magazine\": {" + " \"@style\": \"glossy\","
-						+ " \"@frequency\": \"monthly\","
-						+ " \"price\": \"2.50\"," + " \"subscription\": {"
-						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
-						+ " }" + " }", result.getText());
+				"<bookstore specialty=\"novel\"> <book style=\"autobiography\"> <author> <first-name>Joe</first-name> <last-name>Bob</last-name> <award>Trenton Literary Review Honorable Mention</award> </author> <price>12</price> </book> <book style=\"textbook\"> <author> <first-name>Mary</first-name> <last-name>Bob</last-name> <publication>Selected Short Stories of<first-name>Mary</first-name> <last-name>Bob</last-name> </publication> </author> <editor> <first-name>Britney</first-name> <last-name>Bob</last-name> </editor> <price>55</price> </book> <book style=\"novel\" id=\"myfave\"> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author> <price intl=\"Canada\" exchange=\"0.7\">6.50</price> <excerpt> <p>It was a dark and stormy night.</p> <p>But then all nights in Trenton seem dark andstormy to someone who has gone through what<emph>I</emph> have.</p> <definition-list> <term>Trenton</term> <definition>misery</definition> </definition-list> </excerpt> </book> <magazine style=\"glossy\" frequency=\"monthly\"> <price>2.50</price> <subscription price=\"24\" per=\"year\"/> </magazine> </bookstore>",
+				result.getText());
 	}
 
 	/*
@@ -193,7 +84,7 @@ public class TestXPathEvaluator {
 	@Test
 	public void testNodeDotNode() throws Exception {
 		executeQuery("first.name");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -203,62 +94,8 @@ public class TestXPathEvaluator {
 	public void testRootNode() throws Exception {
 		executeQuery("/bookstore");
 		assertEquals(
-				"{"
-						+ " \"@specialty\": \"novel\","
-						+ " \"book\": [{"
-						+ " \"@style\": \"autobiography\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " },"
-						+ " \"price\": \"12\""
-						+ " }, {"
-						+ " \"@style\": \"textbook\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " },"
-						+ " \"editor\": {"
-						+ " \"first-name\": \"Britney\","
-						+ " \"last-name\": \"Bob\""
-						+ " },"
-						+ " \"price\": \"55\""
-						+ " }, {"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
-						+ " \"magazine\": {" + " \"@style\": \"glossy\","
-						+ " \"@frequency\": \"monthly\","
-						+ " \"price\": \"2.50\"," + " \"subscription\": {"
-						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
-						+ " }" + " }", result.getText());
+				"<bookstore specialty=\"novel\"> <book style=\"autobiography\"> <author> <first-name>Joe</first-name> <last-name>Bob</last-name> <award>Trenton Literary Review Honorable Mention</award> </author> <price>12</price> </book> <book style=\"textbook\"> <author> <first-name>Mary</first-name> <last-name>Bob</last-name> <publication>Selected Short Stories of<first-name>Mary</first-name> <last-name>Bob</last-name> </publication> </author> <editor> <first-name>Britney</first-name> <last-name>Bob</last-name> </editor> <price>55</price> </book> <book style=\"novel\" id=\"myfave\"> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author> <price intl=\"Canada\" exchange=\"0.7\">6.50</price> <excerpt> <p>It was a dark and stormy night.</p> <p>But then all nights in Trenton seem dark andstormy to someone who has gone through what<emph>I</emph> have.</p> <definition-list> <term>Trenton</term> <definition>misery</definition> </definition-list> </excerpt> </book> <magazine style=\"glossy\" frequency=\"monthly\"> <price>2.50</price> <subscription price=\"24\" per=\"year\"/> </magazine> </bookstore>",
+				result.getText());
 	}
 
 	/*
@@ -268,89 +105,12 @@ public class TestXPathEvaluator {
 	public void testDoubleSlashNode() throws Exception {
 		executeQuery("//bookstore");
 		assertEquals(
-				"[{"
-						+ " \"@specialty\": \"novel\","
-						+ " \"book\": [{"
-						+ " \"@style\": \"autobiography\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " },"
-						+ " \"price\": \"12\""
-						+ " }, {"
-						+ " \"@style\": \"textbook\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " },"
-						+ " \"editor\": {"
-						+ " \"first-name\": \"Britney\","
-						+ " \"last-name\": \"Bob\""
-						+ " },"
-						+ " \"price\": \"55\""
-						+ " }, {"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " } " + "} " + "}],"
-						+ " \"magazine\": {" + " \"@style\": \"glossy\","
-						+ " \"@frequency\": \"monthly\","
-						+ " \"price\": \"2.50\"," + " \"subscription\": {"
-						+ " \"@price\": \"24\"," + " \"@per\": \"year\" " + "}"
-						+ " }" + " }]", result.getText());
+				"<bookstore specialty=\"novel\"> <book style=\"autobiography\"> <author> <first-name>Joe</first-name> <last-name>Bob</last-name> <award>Trenton Literary Review Honorable Mention</award> </author> <price>12</price> </book> <book style=\"textbook\"> <author> <first-name>Mary</first-name> <last-name>Bob</last-name> <publication>Selected Short Stories of<first-name>Mary</first-name> <last-name>Bob</last-name> </publication> </author> <editor> <first-name>Britney</first-name> <last-name>Bob</last-name> </editor> <price>55</price> </book> <book style=\"novel\" id=\"myfave\"> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author> <price intl=\"Canada\" exchange=\"0.7\">6.50</price> <excerpt> <p>It was a dark and stormy night.</p> <p>But then all nights in Trenton seem dark andstormy to someone who has gone through what<emph>I</emph> have.</p> <definition-list> <term>Trenton</term> <definition>misery</definition> </definition-list> </excerpt> </book> <magazine style=\"glossy\" frequency=\"monthly\"> <price>2.50</price> <subscription price=\"24\" per=\"year\"/> </magazine> </bookstore>",
+				result.getText());
 		executeQuery("//author");
 		assertEquals(
-				"[{"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " }, {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " }, {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " }]", result.getText());
+				"<author> <first-name>Joe</first-name> <last-name>Bob</last-name> <award>Trenton Literary Review Honorable Mention</award> </author> <author> <first-name>Mary</first-name> <last-name>Bob</last-name> <publication>Selected Short Stories of<first-name>Mary</first-name> <last-name>Bob</last-name> </publication> </author> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author>",
+				result.getText());
 	}
 
 	/*
@@ -361,31 +121,7 @@ public class TestXPathEvaluator {
 	public void testNodeWithParameters() throws Exception {
 		executeQuery("//book[/bookstore/@specialty=@style]");
 		assertEquals(
-				"[{"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " }" + " } " + "}]",
+				"<book style=\"novel\" id=\"myfave\"> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author> <price intl=\"Canada\" exchange=\"0.7\">6.50</price> <excerpt> <p>It was a dark and stormy night.</p> <p>But then all nights in Trenton seem dark andstormy to someone who has gone through what<emph>I</emph> have.</p> <definition-list> <term>Trenton</term> <definition>misery</definition> </definition-list> </excerpt> </book>",
 				result.getText());
 	}
 
@@ -395,7 +131,9 @@ public class TestXPathEvaluator {
 	@Test
 	public void testNodeSlashNode() throws Exception {
 		executeQuery("/bookstore/book/author/first-name");
-		assertEquals("[\"Joe\", \"Mary\", \"Toni\"]", result.getText());
+		assertEquals(
+				"<first-name>Joe</first-name> <first-name>Mary</first-name> <first-name>Toni</first-name>",
+				result.getText());
 	}
 
 	/*
@@ -407,31 +145,8 @@ public class TestXPathEvaluator {
 	public void testNodeDoubleSlashNode() throws Exception {
 		executeQuery("bookstore//author");
 		assertEquals(
-				"[{"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " }, {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " }, {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " }]", result.getText());
+				"<author> <first-name>Joe</first-name> <last-name>Bob</last-name> <award>Trenton Literary Review Honorable Mention</award> </author> <author> <first-name>Mary</first-name> <last-name>Bob</last-name> <publication>Selected Short Stories of<first-name>Mary</first-name> <last-name>Bob</last-name> </publication> </author> <author> <first-name>Toni</first-name> <last-name>Bob</last-name> <degree from=\"Trenton U\">B.A.</degree> <degree from=\"Harvard\">Ph.D.</degree> <award>Pulitzer</award> <publication>Still in Trenton</publication> <publication>Trenton Forever</publication> </author>",
+				result.getText());
 	}
 
 	/*
@@ -440,35 +155,10 @@ public class TestXPathEvaluator {
 	@Test
 	public void testNodeAsterickNode() throws Exception {
 		executeQuery("bookstore/*/author");
-		assertEquals(
-				"[{"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " }, {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " }, {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " }]", result.getText());
+		assertEquals("", result.getText());
 
 		executeQuery("book/*/last-name");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -479,9 +169,7 @@ public class TestXPathEvaluator {
 	public void testNodeDoubleSlashNodeSlashNodeDoubleSlashNode()
 			throws Exception {
 		executeQuery("bookstore//book/excerpt//p");
-		assertEquals(
-				"[\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"]",
-				result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -489,11 +177,10 @@ public class TestXPathEvaluator {
 	 * that this situation is essentially the only one in which the period
 	 * notation is required.
 	 */
-	@Ignore("TypeError: XML descendants internal method called on incompatible Object(xParser.js (line 102)) - return eval('this.'+str+';'); (xParser.js (line 98))")
 	@Test
 	public void testDotDoubleSlashNode() throws Exception {
 		executeQuery(".//author");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -502,20 +189,7 @@ public class TestXPathEvaluator {
 	@Test
 	public void testNodeAsterick() throws Exception {
 		executeQuery("bookstore/book/author/*");
-		assertEquals(
-				"[\"Joe\", \"Bob\", \"Trenton Literary Review Honorable Mention\", \"Mary\", \"Bob\","
-						+ " {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }, \"Toni\", \"Bob\", [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }], \"Pulitzer\", [\"Still in Trenton\", \"Trenton Forever\"]]",
-				result.getText());
+		assertEquals("", result.getText());
 
 		executeQuery("author/*");
 		assertEquals("[]", result.getText());
@@ -527,61 +201,7 @@ public class TestXPathEvaluator {
 	@Test
 	public void testAsterickSlashAsterick() throws Exception {
 		executeQuery("*/*");
-		assertEquals(
-				"[\"novel\", [{"
-						+ " \"@style\": \"autobiography\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " },"
-						+ " \"price\": \"12\""
-						+ " }, {"
-						+ " \"@style\": \"textbook\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " },"
-						+ " \"editor\": {"
-						+ " \"first-name\": \"Britney\","
-						+ " \"last-name\": \"Bob\""
-						+ " },"
-						+ " \"price\": \"55\""
-						+ " }, {"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " }" + " } " + "}],"
-						+ " {" + " \"@style\": \"glossy\","
-						+ " \"@frequency\": \"monthly\","
-						+ " \"price\": \"2.50\"," + " \"subscription\": {"
-						+ " \"@price\": \"24\"," + " \"@per\": \"year\"" + " }"
-						+ " }]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -590,61 +210,7 @@ public class TestXPathEvaluator {
 	@Test
 	public void testAsterickAttribute() throws Exception {
 		executeQuery("*[@specialty]");
-		assertEquals(
-				"[\"novel\", [{"
-						+ " \"@style\": \"autobiography\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Joe\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"award\": \"Trenton Literary Review Honorable Mention\""
-						+ " },"
-						+ " \"price\": \"12\""
-						+ " }, {"
-						+ " \"@style\": \"textbook\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"publication\": {"
-						+ " \"#text\": \"Selected Short Stories of\","
-						+ " \"first-name\": \"Mary\","
-						+ " \"last-name\": \"Bob\""
-						+ " }"
-						+ " },"
-						+ " \"editor\": {"
-						+ " \"first-name\": \"Britney\","
-						+ " \"last-name\": \"Bob\""
-						+ " },"
-						+ " \"price\": \"55\""
-						+ " }, {"
-						+ " \"@style\": \"novel\","
-						+ " \"@id\": \"myfave\","
-						+ " \"author\": {"
-						+ " \"first-name\": \"Toni\","
-						+ " \"last-name\": \"Bob\","
-						+ " \"degree\": [{"
-						+ " \"@from\": \"Trenton U\","
-						+ " \"#text\": \"B.A.\""
-						+ " }, {"
-						+ " \"@from\": \"Harvard\","
-						+ " \"#text\": \"Ph.D.\""
-						+ " }],"
-						+ " \"award\": \"Pulitzer\","
-						+ " \"publication\": [\"Still in Trenton\", \"Trenton Forever\"]"
-						+ " },"
-						+ " \"price\": {"
-						+ " \"@intl\": \"Canada\","
-						+ " \"@exchange\": \"0.7\","
-						+ " \"#text\": \"6.50\""
-						+ " },"
-						+ " \"excerpt\": {"
-						+ " \"p\": [\"It was a dark and stormy night.\", \"But then all nights in Trenton seem dark andstormy to someone who has gone through whatI have.\"],"
-						+ " \"definition-list\": {" + " \"term\": \"Trenton\","
-						+ " \"definition\": \"misery\"" + " }" + " }" + " }],"
-						+ " {" + " \"@style\": \"glossy\","
-						+ " \"@frequency\": \"monthly\","
-						+ " \"price\": \"2.50\"," + " \"subscription\": {"
-						+ " \"@price\": \"24\"," + " \"@per\": \"year\"" + " }"
-						+ " }]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -654,7 +220,7 @@ public class TestXPathEvaluator {
 	@Test
 	public void testAttribute() throws Exception {
 		executeQuery("@style");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	/*
@@ -1359,32 +925,32 @@ public class TestXPathEvaluator {
 	@Test
 	public void testEmpty() throws Exception {
 		executeQuery("//Website");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	@Test
 	public void testSingleSlash() throws Exception {
 		executeQuery("/book");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	@Test
 	public void testSingleSlashMultiple() throws Exception {
 		executeQuery("/bookstore/book/author/test");
-		assertEquals("[]", result.getText());
+		assertEquals("", result.getText());
 	}
 
 	@Test
 	public void testSingleSlashAttribute() throws Exception {
 		executeQuery("/bookstore/@specialty");
-		assertEquals("\"novel\"", result.getText());
+		assertEquals("<bookstore specialty=\"novel\"/>", result.getText());
 	}
 
-	@Ignore
 	@Test
 	public void testSingleSlashMultipleAttribute() throws Exception {
 		executeQuery("/bookstore/book/@style");
-		assertEquals("[\"autobiography\", \"textbook\", \"novel\"]",
+		assertEquals(
+				"<@style>autobiography</@style> <@style>textbook</@style> <@style>novel</@style>",
 				result.getText());
 	}
 
