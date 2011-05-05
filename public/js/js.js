@@ -314,7 +314,7 @@ function XPathEval()
 			var now   = new Date().getTime();
 
 			// Slow it down?
-			if (timer > 0 && now-timer < 1500)
+			if (timer > 0 && now-timer < 350)
 				return;
 
 			// Disabled?
