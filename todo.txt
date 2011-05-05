@@ -10,3 +10,4 @@ show .. | * ?
 bookstore[@specialty='novel']
 display error msg for query
 Parent node names (*)
+/bookstore/book[@a//]
