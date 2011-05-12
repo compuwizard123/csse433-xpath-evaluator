@@ -1,13 +1,15 @@
 function XPathEval()
 {
-	var self = this;
+	var self      = this;
 	var xmlLoaded = false
 	var xmlJson   = false;
 	var jsonStr   = false;
+	var idNode    = '#$__ID$$';
 	var xpath     = $('#xpath');
 	var graphWrap = $('#graphWrap');
 	var steps     = $('.steps', '#resultsWrap');
 	var stepData  = $('#stepData');
+	window.idNode = idNode;
 
 	this.uuidGen    = function(){ return (((1+Math.random())*0x10000)|0).toString(16).substring(1); }
 	this.UUID       = function(){ return (this.uuidGen()+this.uuidGen()+'-'+this.uuidGen()+'-'+this.uuidGen()+'-'+this.uuidGen()+'-'+this.uuidGen()+this.uuidGen()+this.uuidGen()); }
@@ -50,7 +52,7 @@ function XPathEval()
 			{
 				// We're an attribute OR! #text node
 				// Skip it because the parent should have grabbed it already
-				if (x.substr(0, 1) == '@' || x == '#text')
+				if (x.substr(0, 1) == '@' || x == '#text' || x.toString() === idNode)
 					continue;
 
 				// Let's see if this node has any attributes
@@ -69,7 +71,7 @@ function XPathEval()
 				// Push the node onto the array stack
 				arr.push(
 				{
-					id       : self.UUID(),
+					id       : (typeof(obj[x][idNode]) == 'string') ? obj[x][idNode] : self.UUID(),
 					name     : nm || x,
 					data     : data,
 					children : (typeof(obj[x]) == 'object' || obj[x] instanceof Array) ? loop(obj[x], (obj[x] instanceof Array) ? x : false) : []
@@ -102,6 +104,24 @@ function XPathEval()
 		catch(me){ return false; }
 	}
 
+	this.populateIds = function(json)
+	{
+		function loop(obj)
+		{
+			var tmp = (obj instanceof Array) ? [] : {};
+			for (var x in obj)
+			{
+				tmp[x] = ((typeof(obj[x]) == 'object' && !(obj[x] instanceof Array)) || obj[x] instanceof Array) ? loop(obj[x]) : ((x.substr(0, 1) == '@' || x == '#text') ? obj[x] : {'#text': obj[x]});
+				if ((typeof(obj[x]) == 'object' && !(obj[x] instanceof Array)) || (typeof(obj[x]) == 'string' && !(x.substr(0, 1) == '@' || x == '#text')))
+					tmp[x][idNode] = self.UUID();
+			}
+
+			return tmp;
+		}
+
+		return loop(json);
+	}
+
 	this.loadXml = function()
 	{
 		var xml = self.parseXml($('#xmlData').val());
@@ -118,34 +138,35 @@ function XPathEval()
 		var jsonStr = xml2json(xml, "  ");
 		eval('xmlJson = '+jsonStr);
 
-		// xmlJson   = self.cleanJson(xmlJson);
+		xmlJson   = self.populateIds(xmlJson);
 		xmlLoaded = true;
+
+		console.log(xmlJson);
 		self.viewTree(xmlJson);
 	}
 
-	this.buildResults = function(r, res)
+	this.buildResults = function(steps, res, r)
 	{
 		var arr = [];
-		function loop(obj)
+		for (var i=0; i<steps.length; i++)
+			arr.push($.extend(steps[i], {pnode: self.getPname(steps[i].node)}));
+
+		arr.push(
 		{
-			if (obj.hasParent())
-				loop(obj.parent());
-
-			arr[arr.length] = {message: obj.message, pnode: self.getPname(obj), kjson: obj.jsonObj, json: self.fixJsonResult(obj)}
-		}
-
-		loop(r);
-		arr[arr.length] = {message: 'Final result', json: res}
+			message: 'Final result',
+			json   : (typeof(res) == 'string') ? r.parent(false).getJson() : res,
+			pnode  : self.getPname(r)
+		});
 
 		return arr;
 	}
 
 	this.getPname = function(x)
 	{
-		if (x.pName)
-			return x.pName;
+		if (typeof(x.pName) != 'undefined' && x.pName != null)
+			return (x.pName.charAt(0) == '@' && x != x.parent(false)) ? this.getPname(x.parent(false)) : x.pName;
 		else if (x.hasParent())
-			return this.getPname(x.parent());
+			return this.getPname(x.parent(false));
 		else
 			return false;
 	}
@@ -156,10 +177,7 @@ function XPathEval()
 
 		if ($.isArray(obj.getJson()))
 		{
-			// if (obj.getJson().length == 1)
-				res[self.getPname(obj) || 'result'] = obj.getJson();
-			// else
-				// res = obj.getJson();
+			res[self.getPname(obj) || 'result'] = obj.getJson();
 		}
 		else if ($.isPlainObject(obj.getJson()))
 		{
@@ -174,10 +192,9 @@ function XPathEval()
 		}
 		else if (typeof(obj.getJson()) == 'string')
 		{
-			rt = self.getPname(obj.parent());
+			rt = self.getPname(obj.parent(false));
 			ct = self.getPname(obj);
 
-			console.log({rt: rt, ct: ct});
 			res[(ct[0] == '@') ? rt: ct] = (ct[0] == '@') ? {} : obj.getJson();
 			if (ct[0] == '@')
 				res[rt][ct] = obj.getJson();
@@ -186,8 +203,10 @@ function XPathEval()
 		return res;
 	}
 
-	this.evaluate = function()
+	this.evaluate = function(e)
 	{
+		e.preventDefault();
+
 		// Do some checking
 		if (xmlLoaded !== true)
 		{
@@ -201,21 +220,27 @@ function XPathEval()
 		$('#xmlResult').empty();
 
 		// Load xParser and parse it!
-		var x = new xParser(xmlJson);
-		var r = x.parse(xpath.val());
-
-		// Inline step-loop method
-		function loopSteps(obj)
+		var steps  = [];
+		var parser = new xParser(xmlJson, null, null, function(msg, fail)
 		{
-			if (obj.hasParent())
-				loopSteps(obj.parent());
+			var json = this.getJson();
+			if ((json instanceof Array) && (typeof(json[0]) == 'string'))
+				json = this.parent(false).getJson();
 
-			$('ol', steps).append($('<li></li>').html('<strong>'+obj.message+'</strong><br /><pre>'+js_beautify($.toJSON(obj.jsonObj), {indent_size: 1, indent_char: '  '})+'</pre>'));
-		}
+			steps[steps.length] =
+			{
+				message: msg,
+				json   : json,
+				fail   : fail || false,
+				node   : this
+			}
+		});
 
+		var res = parser.parse(xpath.val());
 		// Error?
-		if (r === false)
+		if (res === false)
 		{
+			self.setMessage('Invalid XPath Expression!', 'error');
 			xpath.addClass('error').bind('keydown.xpath focus.xpath', function()
 			{
 				if ($(this).hasClass('error'))
@@ -227,81 +252,23 @@ function XPathEval()
 			if ($('#resultsWrap').is(':hidden'))
 				$('#resultsWrap').fadeIn('fast');
 
-			var res  = self.fixJsonResult(r);
-			var root = null;
-
-			console.log('r', r);
-			console.log('res', res);
-
-			$('#xmlResult').html(self.fixTags(self.formatXml(self.json2xml(res), {indent_size: 1, indent_char: '  '})));
-
+			var fRes = self.fixJsonResult(res);
+			console.log(res, fRes);
+			$('#xmlResult').html(self.fixTags(self.formatXml(self.json2xml(fRes))));
 			if ($(this).hasClass('stepbystep'))
-				self.stepbystep(res, r);
+				self.stepbystep(fRes, res, steps);
 			else
-				self.viewTree(res, root);
+				self.viewTree(fRes);
 		}
 	}
 
-	this.formatXml = function (xml) {
-        var reg = /(>)(<)(\/*)/g;
-        var wsexp = / *(.*) +\n/g;
-        var contexp = /(<.+>)(.+\n)/g;
-        xml = xml.replace(reg, '$1\n$2$3').replace(wsexp, '$1\n').replace(contexp, '$1\n$2');
-        var pad = 0;
-        var formatted = '';
-        var lines = xml.split('\n');
-        var indent = 0;
-        var lastType = 'other';
-        // 4 types of tags - single, closing, opening, other (text, doctype, comment) - 4*4 = 16 transitions 
-        var transitions = {
-            'single->single': 0,
-            'single->closing': -1,
-            'single->opening': 0,
-            'single->other': 0,
-            'closing->single': 0,
-            'closing->closing': -1,
-            'closing->opening': 0,
-            'closing->other': 0,
-            'opening->single': 1,
-            'opening->closing': 0,
-            'opening->opening': 1,
-            'opening->other': 1,
-            'other->single': 0,
-            'other->closing': -1,
-            'other->opening': 0,
-            'other->other': 0
-        };
-
-        for (var i = 0; i < lines.length; i++) {
-            var ln = lines[i];
-            var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
-            var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
-            var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-            var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
-            var fromTo = lastType + '->' + type;
-            lastType = type;
-            var padding = '';
-
-            indent += transitions[fromTo];
-            for (var j = 0; j < indent; j++) {
-                padding += '\t';
-            }
-            if (fromTo == 'opening->closing')
-                formatted = formatted.substr(0, formatted.length - 1) + ln + '\n'; // substr removes line break (\n) from prev loop
-            else
-                formatted += padding + ln + '\n';
-        }
-
-        return formatted;
-    }
-
-	this.stepbystep = function(res, r)
+	this.stepbystep = function(res, r, steps)
 	{
-		var resArr = self.buildResults(r, res);
+		var resArr = self.buildResults(steps, res, r);
 		var curIdx = 0;
 		var maxIdx = resArr.length-1;
 
-		console.log('resArr', resArr);
+		console.log('steps', resArr);
 		stepData.data('timer', 0);
 		$('.prev, .next', stepData).addClass('disabled').unbind('click.xpath').bind('click.xpath', function(e, force)
 		{
@@ -310,7 +277,7 @@ function XPathEval()
 			var now   = new Date().getTime();
 
 			// Slow it down?
-			if (timer > 0 && now-timer < 350)
+			if (timer > 0 && now-timer < 400)
 				return;
 
 			// Disabled?
@@ -322,8 +289,8 @@ function XPathEval()
 			// Step it out
 			if ((next && curIdx <= maxIdx) || (!next && curIdx >= 0))
 			{
-				$('.message', stepData).hide().html(resArr[curIdx].message).fadeIn();
-				self.viewTree(resArr[curIdx].json, resArr[curIdx].pnode);
+				$('.message', stepData).hide().html(resArr[curIdx].message || '<i>Unknown step</i>').fadeIn();
+				self.viewTree(resArr[curIdx].json, resArr[curIdx].pnode, resArr[curIdx].fail);
 			}
 
 			// Update buttons and timer
@@ -334,12 +301,18 @@ function XPathEval()
 				stepData.data('timer', now);
 		});
 
+		// Are we hiding?!
+		if (stepData.is(':hidden'))
+			stepData.slideDown('fast');
+
+		// Let's automate the start of stepping
 		$('.next', stepData).trigger('click.xpath', [true]);
-		if (stepData.is(':hidden')) stepData.slideDown('fast');
 	}
 
-	this.viewTree = function(json, root)
+	this.viewTree = function(json, root, fail)
 	{
+		hilite = true;
+
 		var isHidden = graphWrap.is(':hidden');
 		var inited   = (graphWrap.data('inited') === true);
 
@@ -437,23 +410,27 @@ function XPathEval()
 				{
 					label.id        = node.id;
 					label.innerHTML = node.name;
-					label.onclick   = function()
-					{
-						st.onClick(node.id,
-						{
-							Move:
-							{
-								enable  : true,
-								offsetY : 15
-							}
-						});
-					}
+					// label.onclick   = function()
+					// {
+						// st.onClick(node.id,
+						// {
+							// Move:
+							// {
+								// enable  : true,
+								// offsetY : 15
+							// }
+						// });
+					// }
 				},
 
 				onBeforePlotNode: function(node)
 				{
-					if (node.selected)
-						node.data.$color = "#ff7";
+					var _nodes = graphWrap.data('tree').hiliteNodes;
+					var _idx   = (jQuery.isArray(_nodes) && jQuery.inArray(node.id, _nodes) >= 0);
+					var _fail  = (graphWrap.data('tree').fail);
+
+					if (node.selected || _idx)
+						node.data.$color = (_fail) ? '#FFDDDD' : '#ff7';
 					else
 					{
 						delete node.data.$color;
@@ -464,6 +441,9 @@ function XPathEval()
 							node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
 						}
 					}
+
+					if (_nodes.length && node.selected && node.id == graphWrap.data('tree').root && !_idx)
+						delete node.data.$color;
 				},
 
 				onBeforePlotLine: function(adj)
@@ -486,9 +466,49 @@ function XPathEval()
 		else
 			st = graphWrap.data('tree');
 
-		// Load the JSON baby
-		st.graph.empty();
-		st.loadJSON(self.json2jit(json, root));
+		st.hiliteNodes = [];
+		st.fail        = (fail === true) ? true : false;
+
+		if (hilite)
+		{
+			if (st.isXmlJson !== true)
+			{
+				st.isXmlJson  = true;
+				st.jitXmlJson = self.json2jit(xmlJson);
+
+				st.graph.empty();
+				st.loadJSON(st.jitXmlJson);
+			}
+
+			if (typeof(json[idNode]) == 'string' && json[idNode])
+				st.hiliteNodes.push(json[idNode]);
+			else
+				for (var x in json)
+				{
+					if (!st.hiliteNodes.length && json[x] instanceof Array)
+					{
+						for (var y in json[x])
+						{
+							if (typeof(json[x][y][idNode]) == 'string' && json[x][y][idNode])
+								st.hiliteNodes.push(json[x][y][idNode]);
+							else if (json[x][y] instanceof Array)
+								for (var z in json[x][y])
+								{
+									if (typeof(json[x][y][z][idNode]) == 'string' && json[x][y][z][idNode])
+										st.hiliteNodes.push(json[x][y][z][idNode]);
+								}
+						}
+					}
+					else if (typeof(json[x][idNode]) == 'string' && json[x][idNode])
+						st.hiliteNodes.push(json[x][idNode]);
+				}
+		}
+		else
+		{
+			st.graph.empty();
+			st.loadJSON(self.json2jit(json, root));
+		}
+
 		st.compute();
 		st.onClick(st.root, {Move: {enable: true, offsetY: 185}});
 
@@ -501,42 +521,93 @@ function XPathEval()
 
 	this.json2xml = function(o, tab)
 	{
-		var toXml = function(v, name, ind) {
-		var xml = "";
-		if (v instanceof Array) {
-		for (var i=0, n=v.length; i<n; i++)
-		xml += ind + toXml(v[i], name, ind+"\t") + "\n";
-		}
-		else if (typeof(v) == "object") {
-		var hasChild = false;
-		xml += ind + "<" + name;
-		for (var m in v) {
-		if (m.charAt(0) == "@")
-		xml += " " + m.substr(1) + "=\"" + v[m].toString() + "\"";
-		else
-		hasChild = true;
-		}
-		xml += hasChild ? ">" : "/>";
-		if (hasChild) {
-		for (var m in v) {
-		if (m == "#text")
-		xml += v[m];
-		else if (m == "#cdata")
-		xml += "<![CDATA[" + v[m] + "]]>";
-		else if (m.charAt(0) != "@")
-		xml += toXml(v[m], m, ind+"\t");
-		}
-		xml += (xml.charAt(xml.length-1)=="\n"?ind:"") + "</" + name + ">";
-		}
-		}
-		else {
-		xml += ind + "<" + name + ">" + v.toString() +  "</" + name + ">";
-		}
-		return xml;
+		var toXml = function(v, name, ind)
+		{
+			var xml = "";
+			if (v instanceof Array)
+			{
+				for (var i=0, n=v.length; i<n; i++)
+					xml += ind + toXml(v[i], name, ind+"\t") + "\n";
+			}
+			else if (typeof(v) == "object")
+			{
+				var hasChild = false;
+				xml += ind + "<" + name;
+				for (var m in v)
+				{
+					if (m.toString() === idNode)
+						continue;
+
+					if (m.charAt(0) == "@")
+						xml += " " + m.substr(1) + "=\"" + v[m].toString() + "\"";
+					else
+						hasChild = true;
+				}
+
+				xml += hasChild ? ">" : "/>";
+				if (hasChild)
+				{
+					for (var m in v)
+					{
+						if (m.toString() === idNode)
+							continue;
+
+						if (m == "#text")
+						xml += v[m];
+						else if (m == "#cdata")
+						xml += "<![CDATA[" + v[m] + "]]>";
+						else if (m.charAt(0) != "@")
+						xml += toXml(v[m], m, ind+"\t");
+					}
+
+					xml += (xml.charAt(xml.length-1)=="\n"?ind:"") + "</" + name + ">";
+				}
+			}
+			else
+				xml += ind + "<" + name + ">" + v.toString() +  "</" + name + ">";
+
+			return xml;
 		}, xml="";
 		for (var m in o)
-		xml += toXml(o[m], m, "");
+			xml += toXml(o[m], m, "");
+
 		return tab ? xml.replace(/\t/g, tab) : xml.replace(/\t|\n/g, "");
+	}
+
+	this.formatXml = function(str)
+	{
+		var ind, node, arr, i;
+		var xml   = '';
+		var pad   = 0;
+		var space = function(n)
+		{
+			var str = '';
+			for (var i=0; i<(n*4); i++)
+				str += ' ';
+
+			return str;
+		}
+
+		str = str.replace(/(>)(<)(\/*)/g, "$1\r$2$3");
+		arr = str.split("\r");
+
+		for (i=0; i<arr.length; i++)
+		{
+			ind  = 0;
+			node = arr[i];
+
+			if (node.match(/.+<\/\w[^>]*>$/))
+				ind = 0;
+			else if (node.match(/^<\/\w/) && pad > 0)
+				pad -= 1;
+			else if (node.match(/^<\w[^>]*[^\/]>.*$/))
+				ind = 1;
+
+			xml += space(pad)+node+"\r";
+			pad += ind;
+		}
+
+		return xml;
 	}
 
 	this.fixTags = function(str)
@@ -564,7 +635,6 @@ function XPathEval()
 		if (typeof quote_style !== 'number') { // Allow for a single string or an array of string flags
 			quote_style = [].concat(quote_style);
 			for (i = 0; i < quote_style.length; i++) {
-				// Resolve string input to bitwise e.g. 'PATHINFO_EXTENSION' becomes 4
 				if (OPTS[quote_style[i]] === 0) {
 					noquotes = true;
 				} else if (OPTS[quote_style[i]]) {
@@ -579,7 +649,7 @@ function XPathEval()
 		if (!noquotes) {
 			str = str.replace(/"/g, '&quot;');
 		}
-	 
+
 		return str;
 	}
 
@@ -588,6 +658,7 @@ function XPathEval()
 		// Load XML button
 		$('#loadXml').unbind('click.xpath').bind('click.xpath', function(e)
 		{
+			e.preventDefault();
 			$('#xmlDialog').modal();
 			return false;
 		});
@@ -596,7 +667,7 @@ function XPathEval()
 		$('.load', '#xmlDialog').unbind('click.xpath').bind('click.xpath', this.loadXml);
 
 		// Evaluate
-		$('div.xpathEval').unbind('click.xpath').bind('click.xpath', this.evaluate);
+		$('.xpathEval').unbind('click.xpath').bind('click.xpath', this.evaluate);
 
 		// Autoload!
 		if ($('#xmlData').val())

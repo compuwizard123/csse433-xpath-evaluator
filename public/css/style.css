@@ -1,10 +1,10 @@
 body {background-color:#f0f0f0; color:#222; font:10px normal Verdana, Arial, Helvetica, sans-serif; margin:0; padding:0;}
 input, select {font-size:0.9em;}
-a, a:link, a:active, a:hover, a:visited {color:#23A4FF;}
+a, a:active, a:hover, a:visited {color:#FFF; text-decoration:none;}
 
 /* Sweet Buttons! */
 .button {background:#777 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAYAAABHLFpgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAALdJREFUeNrEjkEWwiAQQyGlwOAN3Hv/m3UnA62vONF2p25lkfeTwAx+CuEWYgguxBgdYoo7YkwDOWeKDEjOO6TQStlRXlkRIylGl3JQYSaFJGxJIq9M2No9OYbuSOncYXuHWZN5Nglhcm6M4eDsfJDrt+Jv8vO7hyzL4rFtD8rmsPbu0bcOtEZq6tG0eVSKqlqhldao1grL2NY728qMhdozfbfqz3sc1dpBnYvMeqyrbet99U8BBgCRTXT4kGguQQAAAABJRU5ErkJggg==) repeat-x bottom; border:none; color:#fff; cursor:pointer; display:inline; font-size:12px; font-weight:bold; padding:5px 10px; border-radius:5px; -moz-border-radius:5px; -webkit-border-radius:5px; text-shadow:1px 1px #666;}
-.button:hover {background-position:0 center;}
+.button:hover {background-position:0 center;color:#FFF;}
 .button:active {background-position:0 top; padding:6px 10px 4px; position:relative; top:1px;}
 .button.black {background-color:#333;}
 .button.blue {background-color:#2c6da0;}
@@ -48,3 +48,4 @@ a, a:link, a:active, a:hover, a:visited {color:#23A4FF;}
 #globalMessage.error {background-color:#FFBABA; color:#D8000C;}
 
 #stepData {display:none; margin-top:7px;}
+#xmlResult {white-space:pre;}
